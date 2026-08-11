@@ -66,9 +66,6 @@ recuperan, con el apoyo de los elementos teóricos que les dan sustento: nocione
 probabilidad, inferencia y regresión, y un panorama de los métodos de inferencia
 causal y de aprendizaje automático.
 
-A diferencia de otras materias de la carrera, aquí el conjunto de datos no viene
-dado: lo construye el estudiante. Todo lo que produzca durante el semestre se acumula
-en un portafolio personal versionado que al terminar el curso queda en su poder.
 
 ## Objetivos
 
@@ -163,6 +160,7 @@ Reglas:
 ### Parcial práctico
 
 Fecha a confirmar.
+
 
 ## Evaluación
 
