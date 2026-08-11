@@ -3,17 +3,13 @@ Portada del repositorio: arte generativo.
 
 Miles de partículas soltadas sobre un campo vectorial suave y aleatorio. Cada
 una deja el rastro de su trayectoria. El campo se arma sumando ondas de
-distinta frecuencia y fase, así que no hay dos corridas iguales.
+distinta frecuencia y fase.
 
 Inspirado en la serie "Art from Code" de Danielle Navarro, escrita en R:
 
     Navarro, Danielle. 2024. "Art from Code I: Generative Art with R."
     https://blog.djnavarro.net/posts/2024-12-18_art-from-code-1/
     Publicado bajo licencia CC BY 4.0.
-
-Su definición del oficio, que es la que se sigue acá: un sistema generativo
-toma basura como entrada y produce algo inesperadamente lindo como salida.
-Los números no significan nada. Ese es exactamente el punto.
 
     python imagenes/portada.py          # una pieza distinta cada vez
     python imagenes/portada.py 2026     # la pieza de esa semilla
