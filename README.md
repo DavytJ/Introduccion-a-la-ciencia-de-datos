@@ -1,3 +1,26 @@
+<p align="center">
+  <img src="imagenes/portada.png" alt="Arte generativo: trayectorias sobre un campo vectorial aleatorio" width="100%">
+</p>
+<p align="center">
+  <sub>
+    Portada generada con código · <a href="imagenes/portada.py"><code>imagenes/portada.py</code></a> · semilla 314<br>
+    Inspirada en la serie <a href="https://blog.djnavarro.net/posts/2024-12-18_art-from-code-1/"><em>Art from Code</em></a>
+    de Danielle Navarro (2024), publicada bajo
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+  </sub>
+</p>
+---
+ 
+# Introducción a la Ciencia de Datos
+ 
+**Universidad de Montevideo · Facultad de Ciencias Empresariales y Economía**
+Curso semestral · 30 sesiones · Agosto a noviembre de 2026
+ 
+Repositorio público del curso: guiones de clase, desafíos, plantillas y el programa.
+ 
+📄 **[Leer el programa](PROGRAMA_ESTUDIANTES.html)** · [ver el fuente](PROGRAMA_ESTUDIANTES.qmd)
+ 
+---
 # Introduccion-a-la-ciencia-de-datos
 Curso de introducción a la ciencia de datos para negocios y finanzas
 
