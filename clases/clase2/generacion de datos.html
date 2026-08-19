@@ -227,6 +227,9 @@ Joselina Davyt-Colo
 <h3 id="una-caja-negra">1.2 Una caja negra</h3>
 <p>El estadístico Leo Breiman (2001) planteó que la naturaleza es una <strong>caja negra</strong> inaccesible en su totalidad. Dentro de la caja negra ocurren interacciones complejas, ruido e incertidumbre. Lo único que nosotros podemos observar son las salidas (<span class="math inline">\(Y\)</span>) generadas a partir de ciertos insumos (<span class="math inline">\(X\)</span>).</p>
 <p><span class="math display">\[X \longrightarrow \boxed{\text{Caja Negra (DGP): } f(X) + \epsilon} \longrightarrow Y\]</span></p>
+</section>
+<section class="slide level2">
+
 <h3 id="por-qué-un-modelo-no-sabe-cómo-se-generaron-los-datos"><strong>¿Por qué un modelo “no sabe” cómo se generaron los datos?</strong></h3>
 <blockquote>
 <p>Un algoritmo de Machine Learning o un modelo estadístico de regresión solo procesa <strong>matrices numéricas</strong>. El modelo no tiene sentido común ni contexto ontológico: - No sabe si la variable <code>peso_g</code> se midió con una balanza digital o con una estimación a ojo. - No sabe si hubo un sesgo de selección en quién decidió responder la encuesta (Meng, 2018). - No comprende la relación causal subyacente; solo optimiza una función de pérdida sobre la muestra que se le entrega.</p>
@@ -256,7 +259,7 @@ Joselina Davyt-Colo
 <section id="construcción-del-dataset-en-código" class="slide level2">
 <h2>2. Construcción del Dataset en Código</h2>
 <p>A continuación, traducimos la experiencia táctil en una estructura de datos real en Python y R.</p>
-<h3 id="crear-dataframe-en-python-pandas">2.1 Crear dataframe en Python (<code>pandas</code>)</h3>
+<h3 class="scrollable" id="crear-dataframe-en-python">2.1 Crear dataframe en Python</h3>
 <p>En visual studio code o en python (PowerShell en Windows o Terminal en Mac):</p>
 <p>pip install pandas numpy matplotlib</p>
 <p>En RStudio:</p>
@@ -266,10 +269,41 @@ Joselina Davyt-Colo
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>reticulate<span class="sc">::</span><span class="fu">py_require</span>(<span class="fu">c</span>(<span class="st">"pandas"</span>, <span class="st">"numpy"</span>, <span class="st">"matplotlib"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</section>
+<section class="slide level2">
+
+<h4 class="scrollable" id="diccionarios-en-python">Diccionarios en python</h4>
 <div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href=""></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-3"><a href=""></a></span>
+<span id="cb3-4"><a href=""></a><span class="co"># Definición del diccionaro crudo recabado en la dinámica</span></span>
+<span id="cb3-5"><a href=""></a>datos_caja <span class="op">=</span> {</span>
+<span id="cb3-6"><a href=""></a>  <span class="st">"objeto_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>],</span>
+<span id="cb3-7"><a href=""></a>  <span class="st">"textura"</span>: [<span class="st">"suave"</span>, <span class="st">"rugoso"</span>, <span class="st">"poroso"</span>, <span class="st">"suave"</span>, <span class="st">"rugoso"</span>, <span class="st">"suave"</span>, <span class="st">"poroso"</span>, <span class="st">"rugoso"</span>, <span class="st">"suave"</span>, <span class="st">"poroso"</span>],</span>
+<span id="cb3-8"><a href=""></a>  <span class="st">"rigidez"</span>: [<span class="st">"blando"</span>, <span class="st">"rígido"</span>, <span class="st">"medio"</span>, <span class="st">"blando"</span>, <span class="st">"rígido"</span>, <span class="st">"rígido"</span>, <span class="st">"blando"</span>, <span class="st">"medio"</span>, <span class="st">"medio"</span>, <span class="st">"blando"</span>],</span>
+<span id="cb3-9"><a href=""></a>  <span class="st">"num_aristas"</span>: [<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">12</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>, <span class="dv">4</span>, <span class="dv">0</span>],</span>
+<span id="cb3-10"><a href=""></a>    <span class="st">"peso_estimado_g"</span>: [<span class="fl">45.0</span>, <span class="fl">120.5</span>, <span class="fl">15.0</span>, <span class="fl">85.0</span>, <span class="fl">210.0</span>, <span class="fl">35.0</span>, <span class="fl">18.5</span>, <span class="fl">95.0</span>, <span class="fl">70.0</span>, <span class="fl">22.0</span>],</span>
+<span id="cb3-11"><a href=""></a>    <span class="st">"certeza_observador"</span>: [<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>]</span>
+<span id="cb3-12"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a><span class="co"># transformacion a dataframe</span></span>
+<span id="cb4-2"><a href=""></a>df_python <span class="op">=</span> pd.DataFrame(datos_caja)</span>
+<span id="cb4-3"><a href=""></a></span>
+<span id="cb4-4"><a href=""></a><span class="co"># Convertir tipos categóricos y ordinales</span></span>
+<span id="cb4-5"><a href=""></a>df_python[<span class="st">"textura"</span>] <span class="op">=</span> df_python[<span class="st">"textura"</span>].astype(<span class="st">"category"</span>)</span>
+<span id="cb4-6"><a href=""></a>df_python[<span class="st">"rigidez"</span>] <span class="op">=</span> pd.Categorical(</span>
+<span id="cb4-7"><a href=""></a>    df_python[<span class="st">"rigidez"</span>], </span>
+<span id="cb4-8"><a href=""></a>    categories<span class="op">=</span>[<span class="st">"blando"</span>, <span class="st">"medio"</span>, <span class="st">"rígido"</span>], </span>
+<span id="cb4-9"><a href=""></a>    ordered<span class="op">=</span><span class="va">True</span></span>
+<span id="cb4-10"><a href=""></a>)</span>
+<span id="cb4-11"><a href=""></a></span>
+<span id="cb4-12"><a href=""></a><span class="bu">print</span>(<span class="st">"Estructura del DataFrame en Python:"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Estructura del DataFrame en Python:</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="bu">print</span>(df_python.info())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;class 'pandas.DataFrame'&gt;
 RangeIndex: 10 entries, 0 to 9
@@ -286,6 +320,7 @@ dtypes: category(2), float64(1), int64(3)
 memory usage: 628.0 bytes
 None</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="bu">print</span>(df_python.head())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   objeto_id textura rigidez  num_aristas  peso_estimado_g  certeza_observador
 0          1   suave  blando            0             45.0                   5
@@ -295,19 +330,23 @@ None</code></pre>
 4          5  rugoso  rígido           12            210.0                   4</code></pre>
 </div>
 </div>
-<h3 id="crear-dataframe-en-r">Crear dataframe en R</h3>
 </section>
-<section id="datos-simulados-vs-datos-sintéticos" class="slide level2">
+<section id="datos-simulados-vs-datos-sintéticos" class="slide level2 scrollable">
 <h2>Datos simulados vs datos sintéticos</h2>
+<h3 id="datos-simulados">Datos simulados</h3>
+<p>Los datos simulados se generan mediante un proceso que implica imitar la operación, comportamiento o evolución de un sistema o proceso del mundo real a lo largo del tiempo, utilizando un modelo simplificado (matemático, físico o computacional).</p>
+<p>Se ejecuta un modelo para imitar la dinámica de un sistema a lo largo del tiempo o bajo distintas condiciones (por ejemplo, simular una partida de ajedrez, el tráfico aéreo o la trayectoria de un huracán).</p>
+<p>Define reglas, ecuaciones o mecánicas de comportamiento</p>
 </section>
 <section id="datos-sintéticos" class="slide level2">
 <h2>3 Datos sintéticos</h2>
 <p>Crear datos sintéticos implica construir un ‘modelo’ de lo que creemos que hay dentro de la caja. Si nuestro modelo es simple, los datos sintéticos serán engañosos. Pero si lo hacemos bien, nos permite compartir datos para investigar sin mostrar el objeto real ni comprometer la privacidad de nadie.</p>
+<p>Toma una muestra real de datos y usa algoritmos (Bootstrap, distribuciones ajustadas, redes GANs) para generar nuevas filas que se parezcan estadísticamente a la tabla original.</p>
+</section>
+<section id="métodos-para-crear-datos-sintéticos" class="slide level2 scrollable">
+<h2>Métodos para crear datos sintéticos</h2>
 <h3 id="generación-paramétrica">Generación paramétrica</h3>
 <p>Generación Paramétrica (Distribución Normal): Para variables cuantitativas continuas (peso_estimado_g). Calculas la media (<span class="math inline">\(\mu\)</span>) y desviación estándar (<span class="math inline">\(\sigma\)</span>) de los 10 alumnos e “inventas” 500 pesos nuevos siguiendo esa campana de Gauss.</p>
-</section>
-<section class="slide level2">
-
 <h3 id="re-muestreo">Re-muestreo</h3>
 <p>Re-muestreo Bootstrap:</p>
 <p>El Bootstrap (Efron, 1979) asume que la muestra observada es la mejor aproximación disponible de la población desconocida.</p>
@@ -346,11 +385,31 @@ None</code></pre>
 </section>
 <section class="slide level2">
 
-<h3 id="datos-sintéticos-de-variables-no-continuas-binarias-y-categóricas">Datos sintéticos de variables no continuas (binarias y categóricas)</h3>
-</section>
-<section class="slide level2">
-
-<h3 id="datos-sintéticos-en-python">Datos sintéticos en python</h3>
+<h3 class="scrollable" id="datos-sintéticos-en-python">Datos sintéticos en python</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-2"><a href=""></a><span class="co"># METODO 1: BOOTSTRAP (Muestreo con reemplazo para expandir a N = 100)</span></span>
+<span id="cb10-3"><a href=""></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-4"><a href=""></a>np.random.seed(<span class="dv">42</span>)  <span class="co"># Semilla para reproducibilidad</span></span>
+<span id="cb10-5"><a href=""></a>df_bootstrap <span class="op">=</span> df_python.sample(n<span class="op">=</span><span class="dv">100</span>, replace<span class="op">=</span><span class="va">True</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-6"><a href=""></a></span>
+<span id="cb10-7"><a href=""></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-8"><a href=""></a><span class="co"># METODO 2: SINTETICO PARAMETRICO (Normal) para Peso (N = 500)</span></span>
+<span id="cb10-9"><a href=""></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-10"><a href=""></a><span class="co"># A. Calculamos los parámetros del modelo probabilístico (DGP estimado)</span></span>
+<span id="cb10-11"><a href=""></a>mu <span class="op">=</span> df_python[<span class="st">'peso_estimado_g'</span>].mean()  <span class="co"># ~71.6 g</span></span>
+<span id="cb10-12"><a href=""></a>sigma <span class="op">=</span> df_python[<span class="st">'peso_estimado_g'</span>].std()  <span class="co"># ~58.3 g</span></span>
+<span id="cb10-13"><a href=""></a></span>
+<span id="cb10-14"><a href=""></a><span class="co"># B. Generamos 500 observaciones sintéticas</span></span>
+<span id="cb10-15"><a href=""></a>pesos_sinteticos <span class="op">=</span> np.random.normal(loc<span class="op">=</span>mu, scale<span class="op">=</span>sigma, size<span class="op">=</span><span class="dv">500</span>)</span>
+<span id="cb10-16"><a href=""></a></span>
+<span id="cb10-17"><a href=""></a><span class="co"># C. Aplicamos restricciones del mundo real (un peso no puede ser &lt;= 0)</span></span>
+<span id="cb10-18"><a href=""></a>pesos_sinteticos <span class="op">=</span> np.clip(pesos_sinteticos, a_min<span class="op">=</span><span class="fl">1.0</span>, a_max<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb10-19"><a href=""></a></span>
+<span id="cb10-20"><a href=""></a>df_sintetico_pesos <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb10-21"><a href=""></a>    {<span class="st">'peso_estimado_g'</span>: pesos_sinteticos, <span class="st">'tipo'</span>: <span class="st">'Sintético'</span>}</span>
+<span id="cb10-22"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 <section id="limitaciones" class="slide level2">
 <h2>Limitaciones:</h2>
@@ -362,7 +421,7 @@ None</code></pre>
 </section>
 <section class="slide level2">
 
-<h3 id="otras-limitaciones">Otras limitaciones</h3>
+<h3 class="scrollable" id="otras-limitaciones">Otras limitaciones</h3>
 <p>El peligro de los datos sintéticos: Generar datos sintéticos asumiendo una distribución Normal cuando el verdadero DGP es multimodal (varios objetos distintos) crea datos “fantasmas” que nunca existirían en la caja real.</p>
 <p>Posible sesgo: El proceso de generación puede introducir sesgos si no refleja con precisión las características reales de la población.</p>
 <p>Falta de contexto: Los conjuntos de datos sintéticos suelen carecer de la información contextual presente en los datos reales, lo que afecta su utilidad para el análisis. Generalización limitada: Los modelos entrenados con datos sintéticos pueden no tener un buen rendimiento con datos reales debido a diferencias en la distribución o los patrones subyacentes. Retos de validación: Puede resultar difícil validar modelos entrenados con datos sintéticos sin oportunidades de prueba en el mundo real.</p>
