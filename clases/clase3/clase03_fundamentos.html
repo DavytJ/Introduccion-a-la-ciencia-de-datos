@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="clase03_fundamentos_files/libs/clipboard/clipboard.min.js"></script>
+<script src="clase03_fundamentos_files/libs/quarto-html/tabby.min.js"></script>
+<script src="clase03_fundamentos_files/libs/quarto-html/popper.min.js"></script>
+<script src="clase03_fundamentos_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="clase03_fundamentos_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="clase03_fundamentos_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="clase03_fundamentos_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
+
+  <meta name="author" content="Joselina Davyt-Colo">
+  <title>Clase 3 - Fundamentos: objetos, tipos y errores</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="clase03_fundamentos_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="clase03_fundamentos_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="clase03_fundamentos_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link href="clase03_fundamentos_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="clase03_fundamentos_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="clase03_fundamentos_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="clase03_fundamentos_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Clase 3 - Fundamentos: objetos, tipos y errores</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Joselina Davyt-Colo 
+</div>
+</div>
+</div>
+
+</section>
+<section>
+<section id="clase-3-fundamentos-de-programación-para-datos" class="title-slide slide level1 center">
+<h1>Clase 3: Fundamentos de programación para datos</h1>
+<p><strong>Subtítulo:</strong> Qué es cada cosa antes de escribir código<br>
+<strong>Institución:</strong> Facultad de Ciencias Empresariales y Economía — Universidad de Montevideo</p>
+</section>
+<section id="por-qué-esta-clase" class="slide level2">
+<h2>Por qué esta clase</h2>
+<p>En la clase 2 escribimos un diccionario y lo convertimos en un DataFrame. Funcionó porque copiamos el código.</p>
+<p>Esta clase responde una pregunta anterior: <strong>¿qué es cada uno de esos objetos?</strong></p>
+<p>La mayoría de los bloqueos en la primera práctica no son de sintaxis. Son de tipo: el alumno cree que tiene un número y tiene un texto, o cree que tiene una tabla y tiene una lista.</p>
+</section>
+<section id="punto-1.-ejecutar-y-leer-el-error" class="slide level2">
+<h2>Punto 1. Ejecutar y leer el error</h2>
+<p>Hay tres maneras de ejecutar código y conviene distinguirlas:</p>
+<ul>
+<li><strong>Línea por línea</strong> en la consola: para probar.</li>
+<li><strong>Archivo completo</strong> (<code>.py</code>, <code>.R</code>): de arriba hacia abajo, siempre en orden.</li>
+<li><strong>Celda por celda</strong> (notebook, <code>.qmd</code>): en el orden en que uno las corre, que no siempre es de arriba hacia abajo.</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Nota</strong></p>
+</div>
+<div class="callout-content">
+<p>La tercera es la que genera más confusión: si se ejecuta la celda 5 antes que la 2, el programa no sabe nada de lo que había en la 2.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="el-error-no-es-un-castigo-es-información">El error no es un castigo, es información</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="pp">NameError</span>: name <span class="st">'df'</span> <span class="kw">is</span> <span class="kw">not</span> defined</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Se lee de abajo hacia arriba. La última línea dice <strong>qué</strong> pasó; las de arriba dicen <strong>dónde</strong>.</p>
+<p>Este mensaje no significa que el código esté mal escrito. Significa que el nombre <code>df</code> nunca fue creado: probablemente la celda que lo creaba no se ejecutó.</p>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="los-tres-errores-del-primer-día">Los tres errores del primer día</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Python</th>
+<th>R</th>
+<th>Qué significa</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NameError: name 'x' is not defined</code></td>
+<td><code>Error: object 'x' not found</code></td>
+<td>El nombre no existe todavía</td>
+</tr>
+<tr class="even">
+<td><code>TypeError</code></td>
+<td><code>Error in ... : non-numeric argument</code></td>
+<td>La operación no corresponde a ese tipo</td>
+</tr>
+<tr class="odd">
+<td><code>FileNotFoundError</code></td>
+<td><code>cannot open file</code></td>
+<td>El archivo no está donde se lo buscó</td>
+</tr>
+</tbody>
+</table>
+<p>El primero es de orden de ejecución. El segundo es de tipo. El tercero es de ubicación.</p>
+<p>Ninguno de los tres se resuelve reescribiendo la línea al azar.</p>
+</section>
+<section id="punto-2.-asignación-el-no-es-una-igualdad" class="slide level2">
+<h2>Punto 2. Asignación: el <code>=</code> no es una igualdad</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="co"># Python</span></span>
+<span id="cb2-2"><a href=""></a>edad <span class="op">=</span> <span class="dv">35</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># R</span></span>
+<span id="cb3-2"><a href=""></a>edad <span class="ot">&lt;-</span> <span class="dv">35</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Se lee: <em>“guardá el valor 35 bajo el nombre <code>edad</code>”</em>.</p>
+<p>No es una ecuación. <code>edad = edad + 1</code> es perfectamente válido y significa “tomá lo que hay en <code>edad</code>, sumale 1 y volvé a guardarlo ahí”.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="nombre-y-valor-son-cosas-distintas">Nombre y valor son cosas distintas</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>peso <span class="op">=</span> <span class="fl">45.0</span>        <span class="co"># el nombre 'peso' apunta al valor 45.0</span></span>
+<span id="cb4-2"><a href=""></a>peso <span class="op">=</span> <span class="fl">120.5</span>       <span class="co"># ahora apunta a otro valor; el 45.0 se perdió</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Una consecuencia práctica: si se ejecuta dos veces una celda que dice <code>df = df.dropna()</code>, la segunda vez trabaja sobre el resultado de la primera. El nombre es el mismo, el contenido no.</p>
+</section>
+<section id="punto-3.-tipos-elementales" class="slide level2">
+<h2>Punto 3. Tipos elementales</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Concepto</th>
+<th>Python</th>
+<th>R</th>
+<th>Ejemplo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Entero</td>
+<td><code>int</code></td>
+<td><code>integer</code></td>
+<td><code>8</code></td>
+</tr>
+<tr class="even">
+<td>Decimal</td>
+<td><code>float</code></td>
+<td><code>numeric</code>/<code>double</code></td>
+<td><code>45.0</code></td>
+</tr>
+<tr class="odd">
+<td>Texto</td>
+<td><code>str</code></td>
+<td><code>character</code></td>
+<td><code>"suave"</code></td>
+</tr>
+<tr class="even">
+<td>Lógico</td>
+<td><code>bool</code></td>
+<td><code>logical</code></td>
+<td><code>True</code> / <code>TRUE</code></td>
+</tr>
+<tr class="odd">
+<td>Ausente</td>
+<td><code>None</code> / <code>NaN</code></td>
+<td><code>NA</code></td>
+<td>celda vacía</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+<h3 id="las-comillas-cambian-el-tipo">Las comillas cambian el tipo</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>peso <span class="op">=</span> <span class="fl">45.0</span>        <span class="co"># float: se le puede calcular un promedio</span></span>
+<span id="cb5-2"><a href=""></a>peso <span class="op">=</span> <span class="st">"45.0"</span>      <span class="co"># str: es la cadena de caracteres "45.0"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="co">"45.0"</span> <span class="op">+</span> <span class="st">"1"</span>       <span class="co"># devuelve '45.01'  (concatena)</span></span>
+<span id="cb6-2"><a href=""></a><span class="fl">45.0</span> <span class="op">+</span> <span class="dv">1</span>           <span class="co"># devuelve 46.0     (suma)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Este es exactamente el error del práctico: un CSV mal leído deja los pesos como texto, y las operaciones siguen funcionando pero dan resultados sin sentido.</p>
+</section>
+<section id="punto-4.-el-vector-en-r-y-la-lista-en-python" class="slide level2">
+<h2>Punto 4. El vector en R y la lista en Python</h2>
+<p>Acá los dos lenguajes se separan, y la diferencia importa.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="co"># R</span></span>
+<span id="cb7-2"><a href=""></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb7-3"><a href=""></a><span class="co"># [1] 1 2 3</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>c()</code> combina valores en un <strong>vector</strong>: una secuencia ordenada de elementos <strong>del mismo tipo</strong>.</p>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="en-r-no-existen-los-números-sueltos">En R no existen los números sueltos</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb8-2"><a href=""></a><span class="fu">length</span>(x)     <span class="co"># [1] 1</span></span>
+<span id="cb8-3"><a href=""></a><span class="fu">is.vector</span>(x)  <span class="co"># [1] TRUE</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>1</code> <strong>es</strong> un vector numérico de longitud 1. R no tiene un tipo “escalar” separado.</p>
+<p>Por eso las operaciones se aplican a todo el vector de una vez:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="sc">*</span> <span class="dv">10</span></span>
+<span id="cb9-2"><a href=""></a><span class="co"># [1] 10 20 30</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No hace falta un bucle. Esto se llama <em>vectorización</em> y es el rasgo central de R.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="el-vector-de-r-homogeneiza-los-tipos">El vector de R homogeneiza los tipos</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="st">"a"</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb10-2"><a href=""></a><span class="co"># [1] "1"    "a"    "TRUE"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No da error: convierte <strong>todo</strong> a texto, porque es el único tipo que puede contener a los tres.</p>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Advertencia</strong></p>
+</div>
+<div class="callout-content">
+<p>Esta conversión es silenciosa. Un solo valor de texto en una columna que debería ser numérica convierte la columna entera en texto.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="en-python-lista-y-recién-después-array">En Python: lista, y recién después array</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]              <span class="co"># lista: admite tipos mezclados</span></span>
+<span id="cb11-2"><a href=""></a>[<span class="dv">1</span>, <span class="st">"a"</span>, <span class="va">True</span>]         <span class="co"># válido, no convierte nada</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>] <span class="op">*</span> <span class="dv">10</span>         <span class="co"># NO multiplica: repite la lista 10 veces</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Para el comportamiento vectorizado de R hay que usar otra estructura:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-2"><a href=""></a>np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]) <span class="op">*</span> <span class="dv">10</span></span>
+<span id="cb13-3"><a href=""></a><span class="co"># array([10, 20, 30])</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section class="slide level2">
+
+<h3 id="resumen-del-punto-4">Resumen del punto 4</h3>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>R</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Estructura básica</td>
+<td>vector (<code>c()</code>)</td>
+<td>lista (<code>[ ]</code>)</td>
+</tr>
+<tr class="even">
+<td>¿Tipos mezclados?</td>
+<td>No: convierte todo</td>
+<td>Sí: los conserva</td>
+</tr>
+<tr class="odd">
+<td>¿Un valor suelto?</td>
+<td>Es un vector de largo 1</td>
+<td>Es un escalar</td>
+</tr>
+<tr class="even">
+<td>Vectorización</td>
+<td>Por defecto</td>
+<td>Con <code>numpy</code></td>
+</tr>
+<tr class="odd">
+<td>Primer elemento</td>
+<td><code>x[1]</code></td>
+<td><code>x[0]</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="punto-5.-diccionario-y-data-frame" class="slide level2">
+<h2>Punto 5. Diccionario y data frame</h2>
+<p>Un <strong>diccionario</strong> en Python asocia nombres a valores:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>{<span class="st">"textura"</span>: [<span class="st">"suave"</span>, <span class="st">"rugoso"</span>], <span class="st">"peso"</span>: [<span class="fl">45.0</span>, <span class="fl">120.5</span>]}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Cada clave es el nombre de una columna; cada valor es la columna entera.</p>
+<p>Un <strong>data frame</strong> es exactamente eso, con la exigencia de que todas las columnas tengan el mismo largo.</p>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="el-dataframe-es-una-colección-de-columnas">El DataFrame es una colección de columnas</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-2"><a href=""></a>df <span class="op">=</span> pd.DataFrame({<span class="st">"textura"</span>: [<span class="st">"suave"</span>, <span class="st">"rugoso"</span>],</span>
+<span id="cb15-3"><a href=""></a>                   <span class="st">"peso"</span>: [<span class="fl">45.0</span>, <span class="fl">120.5</span>]})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">textura =</span> <span class="fu">c</span>(<span class="st">"suave"</span>, <span class="st">"rugoso"</span>),</span>
+<span id="cb16-2"><a href=""></a>                 <span class="at">peso    =</span> <span class="fu">c</span>(<span class="fl">45.0</span>, <span class="fl">120.5</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Cada columna tiene <strong>su propio tipo</strong>. Una fila, en cambio, mezcla tipos: por eso se trabaja por columnas y no por filas.</p>
+</section>
+<section id="punto-6.-función-y-método" class="slide level2">
+<h2>Punto 6. Función y método</h2>
+<p>Una <strong>función</strong> se aplica a un objeto:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a><span class="bu">len</span>(x)          <span class="co"># Python</span></span>
+<span id="cb17-2"><a href=""></a>length(x)       <span class="co"># R</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Un <strong>método</strong> pertenece al objeto y se invoca con punto:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>df.head()       <span class="co"># Python</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>R casi no usa métodos; Python los usa todo el tiempo. Por eso en Python el punto aparece por todos lados.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="los-argumentos-con-nombre-son-instrucciones">Los argumentos con nombre son instrucciones</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>pd.read_csv(<span class="st">"datos.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>, decimal<span class="op">=</span><span class="st">","</span>, encoding<span class="op">=</span><span class="st">"latin-1"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a><span class="fu">read.csv</span>(<span class="st">"datos.csv"</span>, <span class="at">sep =</span> <span class="st">";"</span>, <span class="at">dec =</span> <span class="st">","</span>, <span class="at">fileEncoding =</span> <span class="st">"latin1"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Solo el primer argumento es un <strong>dato</strong> (qué archivo leer). Los otros tres son <strong>instrucciones sobre cómo interpretarlo</strong>.</p>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Importante</strong></p>
+</div>
+<div class="callout-content">
+<p>Cambiar <code>sep</code> no cambia el archivo: cambia la lectura. El mismo archivo leído con dos separadores distintos produce dos tablas distintas.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="punto-7.-la-comparación-devuelve-muchos-valores" class="slide level2">
+<h2>Punto 7. La comparación devuelve muchos valores</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a>df[<span class="st">"peso"</span>] <span class="op">&gt;</span> <span class="dv">50</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No devuelve un <code>True</code>. Devuelve <strong>un <code>True</code> o <code>False</code> por cada fila</strong>:</p>
+<pre><code>0    False
+1     True
+2    False</code></pre>
+<p>Esa secuencia se llama <strong>máscara booleana</strong> y sirve para dos cosas:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a>df[df[<span class="st">"peso"</span>] <span class="op">&gt;</span> <span class="dv">50</span>]           <span class="co"># filtrar: quedarse con las filas True</span></span>
+<span id="cb23-2"><a href=""></a>(df[<span class="st">"peso"</span>] <span class="op">&gt;</span> <span class="dv">50</span>).<span class="bu">sum</span>()       <span class="co"># contar: True vale 1, False vale 0</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="punto-8.-dónde-está-el-archivo" class="slide level2">
+<h2>Punto 8. Dónde está el archivo</h2>
+<p>Todo programa se ejecuta <strong>desde algún lugar</strong>: el directorio de trabajo.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb24-2"><a href=""></a>Path.cwd()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href=""></a><span class="fu">getwd</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Una ruta <strong>relativa</strong> (<code>datos/caja_negra.csv</code>) se busca a partir de ahí. Una ruta <strong>absoluta</strong> (<code>C:/Users/jodavyt/...</code>) contiene el nombre de usuario de quien la escribió y falla en cualquier otra máquina.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="ejercicio-opción-múltiple" class="title-slide slide level1 center">
+<h1>Ejercicio: opción múltiple</h1>
+<p>Una sola respuesta correcta por pregunta. Justificar la elección en la bitácora cuando la consigna lo pida.</p>
+</section>
+<section id="preguntas-1-a-4" class="slide level2 scrollable">
+<h2>Preguntas 1 a 4</h2>
+<p><strong>1.</strong> En R, <code>c(1, 2, 3)</code> es:</p>
+<ol type="a">
+<li>Una función que suma 1 + 2 + 3</li>
+<li>Un vector numérico de longitud 3</li>
+<li>Tres objetos independientes guardados juntos</li>
+<li>Una matriz de tres filas</li>
+</ol>
+<p><strong>2.</strong> En R, ¿qué es el valor <code>1</code> escrito solo?</p>
+<ol type="a">
+<li>Un número, que no es lo mismo que un vector</li>
+<li>Un vector numérico de longitud 1</li>
+<li>Un entero, incompatible con los decimales</li>
+<li>Depende de si fue asignado a un nombre</li>
+</ol>
+<p><strong>3.</strong> <code>c(1, "a", TRUE)</code> en R devuelve:</p>
+<ol type="a">
+<li>Un error por mezclar tipos</li>
+<li>Un vector con un número, un texto y un lógico</li>
+<li>Un vector de texto: <code>"1" "a" "TRUE"</code></li>
+<li>Un vector lógico de longitud 3</li>
+</ol>
+<p><strong>4.</strong> En Python, <code>[1, 2, 3] * 2</code> devuelve:</p>
+<ol type="a">
+<li><code>[2, 4, 6]</code></li>
+<li><code>[1, 2, 3, 1, 2, 3]</code></li>
+<li>Un error de tipo</li>
+<li><code>[1, 2, 3, 2]</code></li>
+</ol>
+</section>
+<section id="preguntas-5-a-8" class="slide level2 scrollable">
+<h2>Preguntas 5 a 8</h2>
+<p><strong>5.</strong> <code>edad = "35"</code> guarda:</p>
+<ol type="a">
+<li>El número 35</li>
+<li>El texto <code>"35"</code></li>
+<li>El número 35, con las comillas ignoradas</li>
+<li>Un error, porque falta declarar el tipo</li>
+</ol>
+<p><strong>6.</strong> <code>NameError: name 'df' is not defined</code> significa que:</p>
+<ol type="a">
+<li>El archivo <code>df.csv</code> no existe</li>
+<li>El nombre <code>df</code> nunca fue creado en esta sesión</li>
+<li><code>df</code> tiene el tipo equivocado</li>
+<li>Falta importar pandas</li>
+</ol>
+<p><strong>7.</strong> En <code>pd.read_csv("datos.csv", sep=";")</code>, el <code>sep=";"</code> es:</p>
+<ol type="a">
+<li>Una segunda columna que se quiere leer</li>
+<li>Una instrucción sobre cómo interpretar el archivo</li>
+<li>El carácter que se va a eliminar del archivo</li>
+<li>Un comentario para el lector del código</li>
+</ol>
+<p><strong>8.</strong> Un mismo archivo leído con <code>sep=","</code> y con <code>sep=";"</code> produce:</p>
+<ol type="a">
+<li>Siempre la misma tabla</li>
+<li>Dos tablas distintas: la lectura es una decisión</li>
+<li>Un error en uno de los dos casos, siempre</li>
+<li>La misma tabla, con las columnas en otro orden</li>
+</ol>
+</section>
+<section id="preguntas-9-a-12" class="slide level2 scrollable">
+<h2>Preguntas 9 a 12</h2>
+<p><strong>9.</strong> <code>df["peso"] &gt; 50</code> devuelve:</p>
+<ol type="a">
+<li>La cantidad de pesos mayores a 50</li>
+<li>Los valores de peso mayores a 50</li>
+<li>Un <code>True</code> o <code>False</code> por cada fila</li>
+<li>Un único <code>True</code> si algún peso supera 50</li>
+</ol>
+<p><strong>10.</strong> La diferencia entre <code>len(x)</code> y <code>x.upper()</code> es que:</p>
+<ol type="a">
+<li>La primera es una función aplicada al objeto; la segunda, un método del objeto</li>
+<li>Ninguna: son dos formas de escribir lo mismo</li>
+<li>La segunda solo funciona en R</li>
+<li>La primera es más rápida</li>
+</ol>
+<p><strong>11.</strong> Un compañero comparte un script que empieza con <code>pd.read_csv("C:/Users/jodavyt/datos.csv")</code>. En tu máquina:</p>
+<ol type="a">
+<li>Funciona igual, porque la ruta está completa</li>
+<li>Falla, porque esa carpeta no existe en tu computadora</li>
+<li>Funciona si tenés la misma versión de Windows</li>
+<li>Funciona si copiás el archivo a tu escritorio</li>
+</ol>
+<p><strong>12.</strong> En un data frame, ¿qué comparte el mismo tipo de dato?</p>
+<ol type="a">
+<li>Cada fila</li>
+<li>Cada columna</li>
+<li>Toda la tabla</li>
+<li>Ninguno: cada celda es independiente</li>
+</ol>
+</section>
+<section id="clave-de-corrección" class="slide level2 scrollable">
+<h2>Clave de corrección</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>Correcta</th>
+<th>El error que detecta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>b</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><strong>b</strong></td>
+<td>Creer que existe un escalar en R</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><strong>c</strong></td>
+<td>Esperar un error donde hay conversión silenciosa</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><strong>b</strong></td>
+<td>Suponer que la lista de Python vectoriza como R</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>b</td>
+<td>No ver que las comillas definen el tipo</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>b</td>
+<td>Confundir nombre inexistente con archivo faltante</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>b</td>
+<td>Leer el argumento como dato y no como instrucción</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>b</td>
+<td>Creer que el archivo tiene una única lectura posible</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>c</td>
+<td>Esperar un valor único donde hay una secuencia</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>a</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>b</td>
+<td>No distinguir ruta absoluta de relativa</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>b</td>
+<td>Pensar la tabla por filas y no por columnas</td>
+</tr>
+</tbody>
+</table>
+<p>Las cuatro en negrita son las que suelen fallar más; conviene discutirlas en clase antes de seguir.</p>
+</section>
+<section id="lo-que-sigue" class="slide level2">
+<h2>Lo que sigue</h2>
+<p>Con estos ocho puntos ya es posible hacer el práctico de creación y carga de datasets:</p>
+<ul>
+<li>Escribir un diccionario y convertirlo en DataFrame</li>
+<li>Guardarlo en un archivo y volver a leerlo</li>
+<li>Diagnosticar un archivo mal formado</li>
+<li>Distinguir un faltante de un cero</li>
+</ul>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="clase03_fundamentos_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="clase03_fundamentos_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiado");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiado");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

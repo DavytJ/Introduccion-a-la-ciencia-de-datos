@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="clase03_anexo_errores_files/libs/clipboard/clipboard.min.js"></script>
+<script src="clase03_anexo_errores_files/libs/quarto-html/tabby.min.js"></script>
+<script src="clase03_anexo_errores_files/libs/quarto-html/popper.min.js"></script>
+<script src="clase03_anexo_errores_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="clase03_anexo_errores_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="clase03_anexo_errores_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="clase03_anexo_errores_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
+
+  <meta name="author" content="Joselina Davyt-Colo">
+  <title>Clase 3 - Anexo: interpretación de errores en R y Python</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="clase03_anexo_errores_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="clase03_anexo_errores_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="clase03_anexo_errores_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link href="clase03_anexo_errores_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="clase03_anexo_errores_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="clase03_anexo_errores_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="clase03_anexo_errores_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Clase 3 - Anexo: interpretación de errores en R y Python</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Joselina Davyt-Colo 
+</div>
+</div>
+</div>
+
+</section>
+<section>
+<section id="anexo-interpretación-de-errores" class="title-slide slide level1 center">
+<h1>Anexo: interpretación de errores</h1>
+<p><strong>Complemento del Punto 1 de la Clase 3</strong><br>
+<strong>Institución:</strong> Facultad de Ciencias Empresariales y Economía — Universidad de Montevideo</p>
+</section>
+<section id="qué-es-este-anexo" class="slide level2">
+<h2>Qué es este anexo</h2>
+<p>El Punto 1 de la clase presentó tres mensajes de error. Este anexo los extiende a un catálogo de consulta.</p>
+<p>No está pensado para dictarse completo: se usa <strong>durante el práctico</strong>, cuando aparece un mensaje que no se entiende.</p>
+<p>Cubre R y Python en paralelo, porque los dos lenguajes fallan de maneras distintas y esa diferencia es en sí misma un contenido de la materia.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="parte-i.-cómo-se-lee-un-mensaje" class="title-slide slide level1 center">
+<h1>Parte I. Cómo se lee un mensaje</h1>
+
+</section>
+<section id="los-tres-desenlaces-posibles" class="slide level2">
+<h2>Los tres desenlaces posibles</h2>
+<p>Cuando una instrucción no hace lo que se esperaba, hay tres finales distintos:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Desenlace</th>
+<th>Qué hace el programa</th>
+<th>Cómo se detecta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Error</strong></td>
+<td>Se detiene y no devuelve nada</td>
+<td>Solo: la pantalla lo muestra</td>
+</tr>
+<tr class="even">
+<td><strong>Advertencia</strong></td>
+<td>Sigue, devuelve algo y avisa</td>
+<td>Leyendo la salida completa</td>
+</tr>
+<tr class="odd">
+<td><strong>Resultado sin sentido</strong></td>
+<td>Sigue, devuelve algo y no avisa</td>
+<td>Únicamente si uno lo controla</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Importante</strong></p>
+</div>
+<div class="callout-content">
+<p>El primero interrumpe el trabajo. El tercero es el único que llega al informe final.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="cada-lenguaje-calla-en-lugares-distintos" class="slide level2 scrollable">
+<h2>Cada lenguaje calla en lugares distintos</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Situación</th>
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Convertir <code>"45,0"</code> a número</td>
+<td>Se detiene (<code>ValueError</code>)</td>
+<td>Devuelve <code>NA</code> con advertencia</td>
+</tr>
+<tr class="even">
+<td>Pedir el elemento 5 de un vector de 3</td>
+<td>Se detiene (<code>IndexError</code>)</td>
+<td>Devuelve <code>NA</code>, sin aviso</td>
+</tr>
+<tr class="odd">
+<td>Pedir una columna que no existe</td>
+<td>Se detiene (<code>KeyError</code>)</td>
+<td>Devuelve <code>NULL</code>, sin aviso</td>
+</tr>
+<tr class="even">
+<td>Sumar una columna que no existe</td>
+<td>Se detiene</td>
+<td>Devuelve <code>0</code>, sin aviso</td>
+</tr>
+<tr class="odd">
+<td>Archivo con una fila de más</td>
+<td>Se detiene (<code>ParserError</code>)</td>
+<td>Lo lee mal y sigue</td>
+</tr>
+<tr class="even">
+<td><strong>Promediar con datos faltantes</strong></td>
+<td><strong>Los ignora y devuelve un número</strong></td>
+<td><strong>Devuelve <code>NA</code></strong></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Advertencia</strong></p>
+</div>
+<div class="callout-content">
+<p>La regla no es “R es permisivo y Python es estricto”. La última fila va en sentido contrario: ante datos faltantes, R se detiene en <code>NA</code> y Python devuelve un promedio calculado sobre las filas que quedaron. Cada lenguaje tiene su propia zona de silencio.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="anatomía-del-mensaje-en-python" class="slide level2">
+<h2>Anatomía del mensaje en Python</h2>
+<pre><code>Traceback (most recent call last):
+  File "analisis.py", line 12, in &lt;module&gt;
+    promedio = df["peso"].mean()
+  File "analisis.py", line 4, in cargar
+    return pd.read_csv(ruta)
+ValueError: could not convert string to float: '45,0'</code></pre>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Parte</th>
+<th>Qué aporta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ValueError</code></td>
+<td>La categoría del problema</td>
+</tr>
+<tr class="even">
+<td><code>could not convert...</code></td>
+<td>Qué pasó, en una frase</td>
+</tr>
+<tr class="odd">
+<td><code>File ..., line 12</code></td>
+<td>Dónde pasó</td>
+</tr>
+<tr class="even">
+<td><code>promedio = df[...]</code></td>
+<td>La línea exacta</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Se lee de abajo hacia arriba.</strong> La última línea dice <em>qué</em>; las de arriba, <em>por dónde llegó</em>.</p>
+</section>
+<section id="anatomía-del-mensaje-en-r" class="slide level2">
+<h2>Anatomía del mensaje en R</h2>
+<p>R no arma un traceback: escribe una sola línea con dos piezas separadas por <code>:</code>.</p>
+<pre><code>Error in edad + 1 : non-numeric argument to binary operator</code></pre>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Parte</th>
+<th>Qué aporta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Error in edad + 1</code></td>
+<td><strong>Dónde</strong>: la operación que falló</td>
+</tr>
+<tr class="even">
+<td><code>non-numeric argument...</code></td>
+<td><strong>Qué</strong>: la descripción del problema</td>
+</tr>
+</tbody>
+</table>
+<p>Cuando el problema no está en ninguna operación en particular, la primera pieza desaparece:</p>
+<pre><code>Error: object 'datos' not found</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="las-advertencias-de-r-se-leen-aparte">Las advertencias de R se leen aparte</h3>
+<p>Las advertencias no interrumpen nada y <strong>pueden aparecer al final</strong>, lejos de la línea que las produjo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">warnings</span>()          <span class="co"># lista las advertencias acumuladas</span></span>
+<span id="cb4-2"><a href=""></a><span class="fu">traceback</span>()         <span class="co"># muestra el camino del último error</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Nota</strong></p>
+</div>
+<div class="callout-content">
+<p>Un script de R puede terminar “bien” y haber dejado veinte advertencias por el camino. Correr <code>warnings()</code> después de cada bloque largo es parte del oficio.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="las-tres-preguntas" class="slide level2">
+<h2>Las tres preguntas</h2>
+<p>Frente a cualquier mensaje, en cualquiera de los dos lenguajes:</p>
+<ol type="1">
+<li><strong>¿De qué tipo es el problema?</strong> ¿Un nombre, un tipo, un valor, una posición, un archivo?</li>
+<li><strong>¿Sobre qué objeto ocurrió?</strong> El mensaje casi siempre lo nombra.</li>
+<li><strong>¿Qué esperaba encontrar el programa y qué encontró en su lugar?</strong></li>
+</ol>
+<p>Las tres se responden leyendo. Ninguna se responde reescribiendo la línea al azar.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="parte-ii.-catálogo-por-causa" class="title-slide slide level1 center">
+<h1>Parte II. Catálogo por causa</h1>
+<p>Seis causas cubren casi todo lo que aparece en el primer mes.</p>
+</section>
+<section id="a.-el-nombre-no-existe" class="slide level2 scrollable">
+<h2>A. El nombre no existe</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NameError: name 'datos' is not defined</code></td>
+<td><code>Error: object 'datos' not found</code></td>
+</tr>
+<tr class="even">
+<td><code>ModuleNotFoundError: No module named 'pandas'</code></td>
+<td><code>Error in library(tidyverse) : there is no package called 'tidyverse'</code></td>
+</tr>
+<tr class="odd">
+<td><code>AttributeError: 'DataFrame' object has no attribute 'colums'</code></td>
+<td><code>Error in meanx(x) : could not find function "meanx"</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Qué revisar, en este orden:</strong></p>
+<ol type="1">
+<li>¿La celda que creaba el objeto se ejecutó en esta sesión?</li>
+<li>¿Está escrito exactamente igual? <code>Peso</code>, <code>peso</code> y <code>PESO</code> son tres nombres distintos en los dos lenguajes.</li>
+<li>¿El paquete está instalado, o está instalado pero sin cargar? Son dos problemas distintos con soluciones distintas.</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<h3 id="el-caso-de-df-en-r">El caso de <code>df</code> en R</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>df<span class="sc">$</span>peso</span>
+<span id="cb5-2"><a href=""></a><span class="co"># Error in df$peso : object of type 'closure' is not subsettable</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>closure</code> significa <strong>función</strong>. El mensaje dice: “le pediste una columna a algo que es una función”.</p>
+<p>En R, <code>df</code> ya existe: es la densidad de la distribución F. Si el objeto propio nunca se creó, el nombre no queda vacío, queda apuntando a la función de R.</p>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Advertencia</strong></p>
+</div>
+<div class="callout-content">
+<p>Nombres a evitar en R porque ya están ocupados: <code>df</code>, <code>data</code>, <code>c</code>, <code>mean</code>, <code>T</code>, <code>F</code>.<br>
+En R conviene llamar a los datos <code>datos</code> o <code>encuesta</code>, no <code>df</code>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="b.-el-código-no-se-puede-leer" class="slide level2 scrollable">
+<h2>B. El código no se puede leer</h2>
+<p>Acá el programa ni siquiera llegó a ejecutar: no entendió la escritura.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="co"># Python</span></span>
+<span id="cb6-2"><a href=""></a><span class="bu">print</span>(<span class="st">"hola"</span></span>
+<span id="cb6-3"><a href=""></a><span class="co"># SyntaxError: '(' was never closed</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="co"># R, en un script</span></span>
+<span id="cb7-2"><a href=""></a><span class="fu">mean</span>(x</span>
+<span id="cb7-3"><a href=""></a><span class="co"># Error: unexpected end of input</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="co"># R, un símbolo donde no corresponde</span></span>
+<span id="cb8-2"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="dv">2</span>)</span>
+<span id="cb8-3"><a href=""></a><span class="co"># Error: unexpected numeric constant</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section class="slide level2">
+
+<h3 id="la-consola-colgada">La consola colgada</h3>
+<p>Si falta cerrar un paréntesis o una comilla, la consola <strong>no da error</strong>: queda esperando el resto.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Lenguaje</th>
+<th>Señal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R</td>
+<td>El prompt cambia de <code>&gt;</code> a <code>+</code></td>
+</tr>
+<tr class="even">
+<td>Python</td>
+<td>El prompt cambia de <code>&gt;&gt;&gt;</code> a <code>...</code></td>
+</tr>
+</tbody>
+</table>
+<p>No es un error: es una pregunta. Se sale con <code>Esc</code> (R) o <code>Ctrl + C</code> (Python) y se vuelve a escribir la línea completa.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="la-indentación-en-python">La indentación en Python</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="cf">if</span> peso <span class="op">&gt;</span> <span class="dv">50</span>:</span>
+<span id="cb9-2"><a href=""></a><span class="bu">print</span>(peso)</span>
+<span id="cb9-3"><a href=""></a><span class="co"># IndentationError: expected an indented block after 'if' statement on line 1</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Python usa el <strong>espacio en blanco</strong> para delimitar bloques; R usa llaves <code>{ }</code>. Un error de sangría en Python es un error real; en R, apenas un problema estético.</p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Nota</strong></p>
+</div>
+<div class="callout-content">
+<p>Configurar el editor para que inserte cuatro espacios en lugar de tabulaciones elimina toda una familia de errores.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="c.-el-tipo-no-corresponde" class="slide level2 scrollable">
+<h2>C. El tipo no corresponde</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>edad <span class="op">=</span> <span class="st">"35"</span></span>
+<span id="cb10-2"><a href=""></a>edad <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb10-3"><a href=""></a><span class="co"># TypeError: can only concatenate str (not "int") to str</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>edad <span class="ot">&lt;-</span> <span class="st">"35"</span></span>
+<span id="cb11-2"><a href=""></a>edad <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb11-3"><a href=""></a><span class="co"># Error in edad + 1 : non-numeric argument to binary operator</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Los dos mensajes dicen lo mismo: <strong>hay un texto donde el programa esperaba un número</strong>.</p>
+<p>El origen casi nunca está en esa línea. Está antes: en una lectura de archivo que dejó la columna como texto.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="el-método-no-existe-para-ese-tipo">El método no existe para ese tipo</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>peso <span class="op">=</span> <span class="fl">45.0</span></span>
+<span id="cb12-2"><a href=""></a>peso.upper()</span>
+<span id="cb12-3"><a href=""></a><span class="co"># AttributeError: 'float' object has no attribute 'upper'</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dos lecturas posibles, y conviene descartarlas en este orden:</p>
+<ol type="1">
+<li>El nombre del método está mal escrito (<code>.uper()</code> en lugar de <code>.upper()</code>).</li>
+<li>El objeto no es lo que se creía. Un <code>AttributeError</code> sobre un objeto que debería ser un DataFrame suele significar que se recibió otra cosa.</li>
+</ol>
+</section>
+<section id="d.-el-valor-no-se-puede-convertir" class="slide level2">
+<h2>D. El valor no se puede convertir</h2>
+<p>Este es el punto donde los dos lenguajes se separan de verdad.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="bu">float</span>(<span class="st">"45,0"</span>)</span>
+<span id="cb13-2"><a href=""></a><span class="co"># ValueError: could not convert string to float: '45,0'</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="fu">as.numeric</span>(<span class="st">"45,0"</span>)</span>
+<span id="cb14-2"><a href=""></a><span class="co"># [1] NA</span></span>
+<span id="cb14-3"><a href=""></a><span class="co"># Warning message: NAs introduced by coercion</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>El tipo era el correcto (los dos recibieron texto, que es lo que esperaban). El <strong>contenido</strong> no se puede interpretar como número, porque la coma decimal no es el separador que el lenguaje espera.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="por-qué-esta-diferencia-importa">Por qué esta diferencia importa</h3>
+<p>Python <strong>se detiene</strong> y obliga a resolverlo. R <strong>devuelve <code>NA</code></strong> y sigue.</p>
+<p>Un archivo con quinientas filas y decimales con coma, leído sin corregir:</p>
+<ul>
+<li>En Python: el proceso se interrumpe en la primera conversión.</li>
+<li>En R: se obtienen quinientos <code>NA</code>, un promedio que es <code>NA</code> y una advertencia de una línea que es fácil pasar por alto.</li>
+</ul>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Importante</strong></p>
+</div>
+<div class="callout-content">
+<p><code>NAs introduced by coercion</code> es la advertencia más importante de R para quien trabaja con datos: significa que se perdieron valores en silencio.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="e.-la-posición-o-la-columna-no-existe" class="slide level2 scrollable">
+<h2>E. La posición o la columna no existe</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operación</th>
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Elemento fuera de rango</td>
+<td><code>IndexError: list index out of range</code></td>
+<td>Devuelve <code>NA</code></td>
+</tr>
+<tr class="even">
+<td>Columna inexistente</td>
+<td><code>KeyError: 'pesoo'</code></td>
+<td><code>d$pesoo</code> devuelve <code>NULL</code></td>
+</tr>
+<tr class="odd">
+<td>Selección explícita</td>
+<td>—</td>
+<td><code>d[, "pesoo"]</code> sí da error: <code>undefined columns selected</code></td>
+</tr>
+</tbody>
+</table>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>)</span>
+<span id="cb15-2"><a href=""></a>x[<span class="dv">5</span>]</span>
+<span id="cb15-3"><a href=""></a><span class="co"># [1] NA        &lt;- no hay error</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Recordar además que <strong>el primer elemento es <code>x[1]</code> en R y <code>x[0]</code> en Python</strong>: pedir <code>x[0]</code> en R devuelve un vector vacío, no el primer valor.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="el-de-r-hace-coincidencias-parciales">El <code>$</code> de R hace coincidencias parciales</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>datos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">peso =</span> <span class="fu">c</span>(<span class="dv">45</span>, <span class="fl">120.5</span>))</span>
+<span id="cb16-2"><a href=""></a>datos<span class="sc">$</span>pes</span>
+<span id="cb16-3"><a href=""></a><span class="co"># [1] 45.0 120.5     &lt;- devolvió la columna 'peso'</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>R completa el nombre si no hay ambigüedad. Es cómodo y es peligroso: un error de tipeo puede devolver la columna equivocada sin ningún aviso.</p>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Advertencia</strong></p>
+</div>
+<div class="callout-content">
+<p>Usar <code>datos[["peso"]]</code> en lugar de <code>datos$peso</code> evita la coincidencia parcial. En Python el problema no existe: <code>df["pes"]</code> da <code>KeyError</code>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="f.-el-archivo-cinco-fallas-distintas" class="slide level2 scrollable">
+<h2>F. El archivo: cinco fallas distintas</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Qué pasó</th>
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No está donde se lo buscó</td>
+<td><code>FileNotFoundError: [Errno 2] No such file or directory</code></td>
+<td><code>cannot open file 'datos.csv': No such file or directory</code></td>
+</tr>
+<tr class="even">
+<td>Separador equivocado</td>
+<td>Una sola columna con todo adentro</td>
+<td>Una sola columna, y a veces filas renombradas</td>
+</tr>
+<tr class="odd">
+<td>Decimal equivocado</td>
+<td>Columna de texto (<code>object</code>)</td>
+<td>Columna <code>chr</code></td>
+</tr>
+<tr class="even">
+<td>Codificación equivocada</td>
+<td><code>UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf1</code></td>
+<td>Advertencia y texto deformado: <code>Se\361or</code></td>
+</tr>
+<tr class="odd">
+<td>Fila con un campo de más</td>
+<td><code>ParserError: Expected 3 fields in line 3, saw 4</code></td>
+<td>Lee mal y sigue</td>
+</tr>
+</tbody>
+</table>
+<p>Las cinco se resuelven con argumentos de lectura, no reescribiendo el archivo.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="el-archivo-no-está-donde-se-lo-buscó">El archivo no está donde se lo buscó</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb17-2"><a href=""></a>Path.cwd()                          <span class="co"># dónde estoy parado</span></span>
+<span id="cb17-3"><a href=""></a><span class="bu">list</span>(Path.cwd().iterdir())          <span class="co"># qué hay acá</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="fu">getwd</span>()                             <span class="co"># dónde estoy parado</span></span>
+<span id="cb18-2"><a href=""></a><span class="fu">list.files</span>()                        <span class="co"># qué hay acá</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Si el archivo aparece en el listado, el problema es el nombre. Si no aparece, el problema es la carpeta.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="separador-decimal-y-codificación">Separador, decimal y codificación</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>pd.read_csv(<span class="st">"datos.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>, decimal<span class="op">=</span><span class="st">","</span>, encoding<span class="op">=</span><span class="st">"latin-1"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a><span class="fu">read.csv</span>(<span class="st">"datos.csv"</span>, <span class="at">sep =</span> <span class="st">";"</span>, <span class="at">dec =</span> <span class="st">","</span>, <span class="at">fileEncoding =</span> <span class="st">"latin1"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tres argumentos, tres problemas independientes:</p>
+<ul>
+<li><code>sep</code> decide <strong>dónde termina cada columna</strong>.</li>
+<li><code>decimal</code> / <code>dec</code> decide <strong>si la coma separa decimales o campos</strong>.</li>
+<li><code>encoding</code> / <code>fileEncoding</code> decide <strong>cómo se traducen las eñes y las tildes</strong>.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="el-caso-más-insidioso-la-fila-de-más">El caso más insidioso: la fila de más</h3>
+<pre><code>a,b,c
+1,2,3
+4,5,6,7      &lt;- una coma de más</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>pd.read_csv(<span class="st">"malo.csv"</span>)</span>
+<span id="cb22-2"><a href=""></a><span class="co"># ParserError: Error tokenizing data. C error: Expected 3 fields in line 3, saw 4</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href=""></a><span class="fu">read.csv</span>(<span class="st">"malo.csv"</span>)</span>
+<span id="cb23-2"><a href=""></a><span class="co">#   a b  c</span></span>
+<span id="cb23-3"><a href=""></a><span class="co"># 1 2 3 NA</span></span>
+<span id="cb23-4"><a href=""></a><span class="co"># 4 5 6  7</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>R no protesta: usa la primera columna como nombres de fila y devuelve una tabla que parece correcta. Los datos están corridos un lugar.</p>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Importante</strong></p>
+</div>
+<div class="callout-content">
+<p>Este es el argumento central del anexo: el mensaje de error de Python es una molestia de treinta segundos; el silencio de R puede sobrevivir hasta la presentación final.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="parte-iii.-los-errores-que-no-dan-error" class="title-slide slide level1 center">
+<h1>Parte III. Los errores que no dan error</h1>
+
+</section>
+<section id="siete-fallas-silenciosas" class="slide level2 scrollable">
+<h2>Siete fallas silenciosas</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Situación</th>
+<th>Qué se obtiene</th>
+<th>Cómo se detecta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Columna numérica leída como texto</td>
+<td><code>.sum()</code> concatena: <code>"45,0120,5"</code></td>
+<td>Revisar los tipos antes de calcular</td>
+</tr>
+<tr class="even">
+<td>Columna inexistente en R</td>
+<td><code>sum(d$pesoo)</code> devuelve <code>0</code></td>
+<td>Comparar contra <code>names(d)</code></td>
+</tr>
+<tr class="odd">
+<td>Coincidencia parcial en R</td>
+<td>Devuelve otra columna</td>
+<td>Usar <code>[["nombre"]]</code></td>
+</tr>
+<tr class="even">
+<td>Faltantes al promediar</td>
+<td>Python los ignora; R devuelve <code>NA</code></td>
+<td>Contar los faltantes primero</td>
+</tr>
+<tr class="odd">
+<td>Reciclaje de vectores en R</td>
+<td>Repite valores para completar</td>
+<td>Comparar <code>length()</code> de los dos vectores</td>
+</tr>
+<tr class="even">
+<td>Resultado no asignado</td>
+<td>Nada cambia</td>
+<td>Verificar <code>shape</code> / <code>dim</code> después</td>
+</tr>
+<tr class="odd">
+<td>Celdas ejecutadas fuera de orden</td>
+<td>Un objeto viejo con nombre nuevo</td>
+<td>Reiniciar y correr todo de arriba abajo</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+<h3 id="la-suma-que-concatena">La suma que concatena</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a>pd.read_csv(<span class="st">"pesos.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>)[<span class="st">"peso"</span>].<span class="bu">sum</span>()</span>
+<span id="cb24-2"><a href=""></a><span class="co"># '45,0120,5'</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No hay error. Hay una cadena de texto que pegó los dos valores uno detrás del otro.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a>pd.read_csv(<span class="st">"pesos.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>)[<span class="st">"peso"</span>].mean()</span>
+<span id="cb25-2"><a href=""></a><span class="co"># TypeError: Cannot perform reduction 'mean' with string dtype</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>El promedio sí protesta. La suma no. <strong>La misma columna mal leída produce un error o un disparate según qué se le pida.</strong></p>
+</section>
+<section class="slide level2">
+
+<h3 id="la-columna-que-no-existe-suma-cero">La columna que no existe suma cero</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href=""></a>datos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">peso =</span> <span class="fu">c</span>(<span class="dv">45</span>, <span class="fl">120.5</span>))</span>
+<span id="cb26-2"><a href=""></a><span class="fu">sum</span>(datos<span class="sc">$</span>pesoo)</span>
+<span id="cb26-3"><a href=""></a><span class="co"># [1] 0</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>datos$pesoo</code> devuelve <code>NULL</code>, y la suma de nada es cero. Un cero es un resultado perfectamente creíble en un informe.</p>
+<p>Verificación de un segundo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href=""></a><span class="fu">names</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section class="slide level2">
+
+<h3 id="el-promedio-con-faltantes">El promedio con faltantes</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a>df[<span class="st">"peso"</span>].mean()     <span class="co"># 82.75  -&gt; ignoró el faltante</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href=""></a><span class="fu">mean</span>(datos<span class="sc">$</span>peso)      <span class="co"># NA     -&gt; se detuvo en el faltante</span></span>
+<span id="cb29-2"><a href=""></a><span class="fu">mean</span>(datos<span class="sc">$</span>peso, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)   <span class="co"># 82.75</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Los dos resultados son defendibles, pero <strong>son decisiones distintas sobre los mismos datos</strong>. Python la toma por defecto; R obliga a escribirla.</p>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Importante</strong></p>
+</div>
+<div class="callout-content">
+<p>Ninguna de las dos es “la correcta”. Lo incorrecto es no saber cuál se tomó. Esto se registra en la bitácora.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="el-resultado-que-no-se-asignó">El resultado que no se asignó</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a>df.dropna()           <span class="co"># devuelve una tabla nueva; df queda igual</span></span>
+<span id="cb30-2"><a href=""></a>df <span class="op">=</span> df.dropna()      <span class="co"># ahora sí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href=""></a><span class="fu">subset</span>(datos, <span class="sc">!</span><span class="fu">is.na</span>(peso))          <span class="co"># se imprime y se pierde</span></span>
+<span id="cb31-2"><a href=""></a>datos <span class="ot">&lt;-</span> <span class="fu">subset</span>(datos, <span class="sc">!</span><span class="fu">is.na</span>(peso)) <span class="co"># ahora sí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Síntoma típico: “corrí la línea y no cambió nada”. No falló: el resultado se calculó, se mostró y se descartó.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="el-reciclaje-de-r">El reciclaje de R</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href=""></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>) <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb32-2"><a href=""></a><span class="co"># [1] 2 4 4 6      &lt;- repitió el vector corto, sin aviso</span></span>
+<span id="cb32-3"><a href=""></a></span>
+<span id="cb32-4"><a href=""></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb32-5"><a href=""></a><span class="co"># [1] 2 4 4</span></span>
+<span id="cb32-6"><a href=""></a><span class="co"># Warning: longer object length is not a multiple of shorter object length</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>R avisa solo cuando los largos no son múltiplos. Cuando sí lo son —el caso más frecuente en la práctica— la operación se completa en silencio.</p>
+</section>
+<section class="slide level2">
+
+<h3 id="comparar-contra-un-faltante">Comparar contra un faltante</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">NA</span>, <span class="dv">3</span>)</span>
+<span id="cb33-2"><a href=""></a>x <span class="sc">==</span> <span class="cn">NA</span></span>
+<span id="cb33-3"><a href=""></a><span class="co"># [1] NA NA NA      &lt;- ni TRUE ni FALSE</span></span>
+<span id="cb33-4"><a href=""></a></span>
+<span id="cb33-5"><a href=""></a><span class="fu">is.na</span>(x)</span>
+<span id="cb33-6"><a href=""></a><span class="co"># [1] FALSE TRUE FALSE</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Un faltante no es igual ni distinto de nada: es desconocido. Filtrar con <code>== NA</code> devuelve una máscara de <code>NA</code> que no selecciona ninguna fila.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="parte-iv.-procedimiento-de-diagnóstico" class="title-slide slide level1 center">
+<h1>Parte IV. Procedimiento de diagnóstico</h1>
+
+</section>
+<section id="cinco-pasos-en-orden" class="slide level2">
+<h2>Cinco pasos, en orden</h2>
+<ol type="1">
+<li><strong>Leer el mensaje entero</strong> y separar las dos piezas: qué y dónde.</li>
+<li><strong>Verificar el objeto</strong>: si existe, qué tipo tiene, qué contiene.</li>
+<li><strong>Reducir</strong>: encontrar la línea mínima que reproduce el problema.</li>
+<li><strong>Comparar</strong> lo que hay con lo que se esperaba: tipos, cantidad de filas, faltantes.</li>
+<li><strong>Registrar</strong> el mensaje y la causa en la bitácora antes de seguir.</li>
+</ol>
+<p>El paso 5 no es burocracia: el mismo error vuelve a aparecer tres semanas después.</p>
+</section>
+<section id="comandos-de-inspección" class="slide level2 scrollable">
+<h2>Comandos de inspección</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pregunta</th>
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>¿Existe el objeto?</td>
+<td><code>"df" in globals()</code></td>
+<td><code>exists("datos")</code></td>
+</tr>
+<tr class="even">
+<td>¿Qué es?</td>
+<td><code>type(x)</code></td>
+<td><code>class(x)</code></td>
+</tr>
+<tr class="odd">
+<td>¿Qué tiene adentro?</td>
+<td><code>df.info()</code></td>
+<td><code>str(datos)</code></td>
+</tr>
+<tr class="even">
+<td>¿De qué tipo es cada columna?</td>
+<td><code>df.dtypes</code></td>
+<td><code>sapply(datos, class)</code></td>
+</tr>
+<tr class="odd">
+<td>¿Cuántas filas y columnas?</td>
+<td><code>df.shape</code></td>
+<td><code>dim(datos)</code></td>
+</tr>
+<tr class="even">
+<td>¿Cómo empieza?</td>
+<td><code>df.head()</code></td>
+<td><code>head(datos)</code></td>
+</tr>
+<tr class="odd">
+<td>¿Cuántos faltantes hay?</td>
+<td><code>df.isna().sum()</code></td>
+<td><code>colSums(is.na(datos))</code></td>
+</tr>
+<tr class="even">
+<td>¿Qué columnas tiene?</td>
+<td><code>df.columns</code></td>
+<td><code>names(datos)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>df.info()</code> y <code>str(datos)</code> son los dos comandos más rentables del curso: contestan cinco preguntas a la vez.</p>
+</section>
+<section id="cómo-buscar-un-mensaje" class="slide level2">
+<h2>Cómo buscar un mensaje</h2>
+<p>El mensaje contiene nombres propios que solo existen en la máquina de quien lo escribió. Buscar así no sirve:</p>
+<pre><code>KeyError: 'peso_kg_2024_final'</code></pre>
+<p>Buscar así sí:</p>
+<pre><code>pandas KeyError columna que existe en el csv</code></pre>
+<p><strong>Regla:</strong> conservar el tipo de error y la parte genérica del mensaje; borrar los nombres de archivos, columnas y rutas.</p>
+</section>
+<section id="el-ejemplo-mínimo-reproducible" class="slide level2">
+<h2>El ejemplo mínimo reproducible</h2>
+<p>Antes de pedir ayuda —a un compañero, a un buscador o a un modelo de lenguaje— conviene reducir el problema a algo que otro pueda ejecutar:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb36-2"><a href=""></a>d <span class="op">=</span> pd.DataFrame({<span class="st">"peso"</span>: [<span class="st">"45,0"</span>, <span class="st">"120,5"</span>]})</span>
+<span id="cb36-3"><a href=""></a>d[<span class="st">"peso"</span>].mean()     <span class="co"># TypeError</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tres líneas, sin archivos externos, sin datos reales. <strong>Muchas veces el problema aparece solo al armar este ejemplo</strong>: la reducción es en sí misma el diagnóstico.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="parte-v.-ejercicios" class="title-slide slide level1 center">
+<h1>Parte V. Ejercicios</h1>
+
+</section>
+<section id="ejercicio-1-opción-múltiple" class="slide level2">
+<h2>Ejercicio 1: opción múltiple</h2>
+<p>Una sola respuesta correcta por pregunta. Justificar en la bitácora las que la consigna indique.</p>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="preguntas-1-a-4">Preguntas 1 a 4</h3>
+<p><strong>1.</strong> En R, <code>Error in df$peso : object of type 'closure' is not subsettable</code> significa que:</p>
+<ol type="a">
+<li>El data frame <code>df</code> está vacío</li>
+<li><code>df</code> nunca fue creado y el nombre corresponde a una función de R</li>
+<li>La columna <code>peso</code> no existe en <code>df</code></li>
+<li>Falta cargar el paquete que define <code>$</code></li>
+</ol>
+<p><strong>2.</strong> En Python, <code>float("45,0")</code> se detiene con <code>ValueError</code>. En R, <code>as.numeric("45,0")</code> devuelve <code>NA</code> con una advertencia. Esto significa que:</p>
+<ol type="a">
+<li>R interpretó bien la coma decimal y Python no</li>
+<li>Los dos fallaron en lo mismo; solo Python interrumpió el trabajo</li>
+<li>R convirtió el valor y Python no pudo</li>
+<li>Son dos operaciones distintas y no se pueden comparar</li>
+</ol>
+<p><strong>3.</strong> Un script de R calcula <code>sum(datos$pesos)</code> y devuelve <code>0</code>. La columna del archivo se llama <code>peso</code>. Lo que ocurrió es que:</p>
+<ol type="a">
+<li>Todos los pesos valen cero</li>
+<li><code>datos$pesos</code> devolvió <code>NULL</code> y la suma de nada es cero</li>
+<li>R convirtió los pesos a texto</li>
+<li>El archivo se leyó vacío</li>
+</ol>
+<p><strong>4.</strong> Sobre los mismos datos con un faltante, <code>df["peso"].mean()</code> devuelve <code>82.75</code> y <code>mean(datos$peso)</code> devuelve <code>NA</code>. Esto se explica porque:</p>
+<ol type="a">
+<li>R leyó mal el archivo</li>
+<li>Python descarta los faltantes por defecto y R no</li>
+<li>Los dos lenguajes calculan promedios distintos</li>
+<li>Falta convertir la columna en Python</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="preguntas-5-a-8">Preguntas 5 a 8</h3>
+<p><strong>5.</strong> <code>ParserError: Expected 3 fields in line 3, saw 4</code> indica que:</p>
+<ol type="a">
+<li>El archivo tiene cuatro columnas y se pidieron tres</li>
+<li>La fila 3 tiene un separador de más respecto del encabezado</li>
+<li>El separador declarado es el equivocado</li>
+<li>La fila 3 está vacía</li>
+</ol>
+<p><strong>6.</strong> <code>UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf1</code> aparece porque:</p>
+<ol type="a">
+<li>El archivo está dañado</li>
+<li>El archivo está guardado en otra codificación y contiene eñes o tildes</li>
+<li>Falta instalar un paquete de idioma</li>
+<li>El separador decimal es una coma</li>
+</ol>
+<p><strong>7.</strong> En R, <code>x &lt;- c(10, 20, 30)</code> y luego <code>x[5]</code>. El resultado es:</p>
+<ol type="a">
+<li>Un error de índice fuera de rango</li>
+<li><code>NA</code>, sin ningún aviso</li>
+<li>El último elemento, <code>30</code></li>
+<li>Un vector vacío</li>
+</ol>
+<p><strong>8.</strong> En R, <code>datos$pes</code> devuelve la columna <code>peso</code>. Esto ocurre porque:</p>
+<ol type="a">
+<li>R corrigió el error de tipeo</li>
+<li><code>$</code> completa nombres parciales cuando no hay ambigüedad</li>
+<li>Las dos columnas existen y son iguales</li>
+<li><code>peso</code> y <code>pes</code> son el mismo nombre para R</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="preguntas-9-a-12">Preguntas 9 a 12</h3>
+<p><strong>9.</strong> Un alumno ejecuta <code>df.dropna()</code>, no aparece ningún error y <code>df</code> sigue teniendo las mismas filas. La causa es que:</p>
+<ol type="a">
+<li>No había faltantes en los datos</li>
+<li>El resultado se calculó y no se asignó a ningún nombre</li>
+<li><code>dropna()</code> no funciona en esa versión de pandas</li>
+<li>Faltaba ejecutar la celda anterior</li>
+</ol>
+<p><strong>10.</strong> <code>IndentationError: expected an indented block after 'if' statement on line 1</code> no tiene equivalente en R porque:</p>
+<ol type="a">
+<li>R no tiene estructuras condicionales</li>
+<li>R delimita los bloques con llaves y no con espacios</li>
+<li>R corrige la sangría automáticamente</li>
+<li>En R la sangría también es obligatoria, pero avisa distinto</li>
+</ol>
+<p><strong>11.</strong> La consola de R muestra <code>+</code> en lugar de <code>&gt;</code> y no responde. Lo que corresponde hacer es:</p>
+<ol type="a">
+<li>Reiniciar la sesión y perder los objetos creados</li>
+<li>Cancelar con <code>Esc</code>: quedó una comilla o un paréntesis sin cerrar</li>
+<li>Escribir <code>+</code> de nuevo para confirmar</li>
+<li>Volver a instalar el paquete que se estaba usando</li>
+</ol>
+<p><strong>12.</strong> En R, <code>c(1, 2, 3, 4) + c(1, 2)</code> devuelve <code>2 4 4 6</code> sin ninguna advertencia porque:</p>
+<ol type="a">
+<li>R sumó solo los dos primeros elementos</li>
+<li>R repitió el vector corto hasta igualar el largo, y los largos son múltiplos</li>
+<li>R convirtió los dos vectores a un solo número</li>
+<li>Es un error que se muestra recién al imprimir</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="clave-de-corrección">Clave de corrección</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Correcta</th>
+<th>El error que detecta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><strong>b</strong></td>
+<td>Suponer que un nombre no usado está vacío</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><strong>b</strong></td>
+<td>Leer la advertencia de R como si fuera un éxito</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><strong>b</strong></td>
+<td>Aceptar un cero creíble sin verificar el nombre</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><strong>b</strong></td>
+<td>No ver que el tratamiento de faltantes es una decisión</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>b</td>
+<td>Confundir un archivo mal formado con una mala lectura</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>b</td>
+<td>Atribuir al archivo un problema de codificación</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td><strong>b</strong></td>
+<td>Esperar que R avise cuando se sale de rango</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td><strong>b</strong></td>
+<td>Confiar en el nombre escrito sin verificar cuál se devolvió</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>b</td>
+<td>Suponer que toda operación modifica el objeto</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>b</td>
+<td>No distinguir sintaxis de convención</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>b</td>
+<td>Leer una pregunta del intérprete como un error</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td><strong>b</strong></td>
+<td>Esperar un error donde hay reciclaje silencioso</td>
+</tr>
+</tbody>
+</table>
+<p>Las seis en negrita corresponden a fallas silenciosas: conviene discutirlas en clase.</p>
+</section>
+<section id="ejercicio-2-diagnóstico" class="slide level2 scrollable">
+<h2>Ejercicio 2: diagnóstico</h2>
+<p>Para cada síntoma, indicar <strong>causa probable</strong> y <strong>el comando de una línea que la confirma</strong>.</p>
+<p><strong>a.</strong> Un promedio de salarios da <code>NA</code> en R. El archivo tiene 1.200 filas y ningún salario vacío a simple vista.</p>
+<p><strong>b.</strong> Una tabla leída en Python tiene una sola columna, cuyo nombre es <code>id;fecha;monto</code>.</p>
+<p><strong>c.</strong> <code>df["monto"].sum()</code> devuelve un texto larguísimo en lugar de un número.</p>
+<p><strong>d.</strong> Un data frame de R se lee sin error, pero tiene una columna menos que el archivo original y los nombres de fila se ven raros.</p>
+<p><strong>e.</strong> El mismo script funciona en la máquina de un compañero y falla en la propia con <code>FileNotFoundError</code>.</p>
+</section>
+<section class="slide level2">
+
+<h3 class="scrollable" id="clave-del-ejercicio-2">Clave del ejercicio 2</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Causa probable</th>
+<th>Confirmación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>Decimales con coma: la columna es texto o quedó en <code>NA</code></td>
+<td><code>str(datos)</code> o <code>sum(is.na(datos$salario))</code></td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>Separador equivocado: el archivo usa <code>;</code></td>
+<td><code>pd.read_csv(ruta, nrows=3)</code> y mirar <code>df.columns</code></td>
+</tr>
+<tr class="odd">
+<td>c</td>
+<td>La columna es texto y la suma concatena</td>
+<td><code>df.dtypes</code></td>
+</tr>
+<tr class="even">
+<td>d</td>
+<td>Alguna fila tiene un campo de más y R corrió los datos</td>
+<td><code>dim(datos)</code> y <code>head(datos)</code> con los nombres de fila</td>
+</tr>
+<tr class="odd">
+<td>e</td>
+<td>Ruta absoluta con el usuario del compañero</td>
+<td><code>getwd()</code> / <code>Path.cwd()</code> y <code>list.files()</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ejercicio-3-para-la-bitácora" class="slide level2">
+<h2>Ejercicio 3: para la bitácora</h2>
+<p>Provocar deliberadamente <strong>seis errores</strong>, tres en cada lenguaje, tomados de causas distintas del catálogo.</p>
+<p>Para cada uno, registrar:</p>
+<ol type="1">
+<li>La línea que lo produjo</li>
+<li>El mensaje completo, copiado tal cual</li>
+<li>Las respuestas a las tres preguntas de la Parte I</li>
+<li>La corrección</li>
+</ol>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Nota</strong></p>
+</div>
+<div class="callout-content">
+<p>Un error provocado a propósito y entendido cuesta dos minutos. El mismo error encontrado durante el práctico cuesta media hora.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="resumen-operativo" class="slide level2">
+<h2>Resumen operativo</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Si el mensaje dice…</th>
+<th>Mirar…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>not defined</code> / <code>not found</code></td>
+<td>El orden de ejecución de las celdas</td>
+</tr>
+<tr class="even">
+<td><code>Syntax</code> / <code>unexpected</code> / prompt <code>+</code></td>
+<td>Paréntesis y comillas sin cerrar</td>
+</tr>
+<tr class="odd">
+<td><code>non-numeric</code> / <code>TypeError</code></td>
+<td>Los tipos de las columnas</td>
+</tr>
+<tr class="even">
+<td><code>could not convert</code> / <code>NAs introduced</code></td>
+<td>El separador decimal</td>
+</tr>
+<tr class="odd">
+<td><code>KeyError</code> / <code>NULL</code> / <code>undefined columns</code></td>
+<td>Los nombres reales de las columnas</td>
+</tr>
+<tr class="even">
+<td><code>FileNotFoundError</code> / <code>cannot open</code></td>
+<td>El directorio de trabajo</td>
+</tr>
+<tr class="odd">
+<td><code>Expected N fields</code> / filas raras</td>
+<td>El archivo crudo, en un editor de texto</td>
+</tr>
+<tr class="even">
+<td><strong>Nada</strong></td>
+<td>Los tipos, el largo y la cantidad de faltantes</td>
+</tr>
+</tbody>
+</table>
+<p>La última fila es la que exige el curso.</p>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="clase03_anexo_errores_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiado");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiado");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
