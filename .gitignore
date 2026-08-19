@@ -1,0 +1,32 @@
+# Quarto
+/.quarto/
+/_site/
+/_libro/
+*_files/
+*_cache/
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+
+# Datos: se versiona el código que los obtiene, no los datos
+datos/crudo/
+*.csv
+*.xlsx
+*.parquet
+
+# Credenciales
+.env
+kaggle.json
+
+# Sistema
+.DS_Store
+Thumbs.db
