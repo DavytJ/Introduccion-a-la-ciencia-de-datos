@@ -3,6 +3,7 @@ EJEMPLO — Un conjunto de datos famoso: los pingüinos de Palmer
 Diez filas reales del dataset "penguins" (Horst, Hill y Gorman, 2020),
 escritas a mano para no depender de la red.
 """
+# %%
 import pandas as pd
 
 pinguinos = pd.DataFrame({
@@ -17,3 +18,35 @@ pinguinos = pd.DataFrame({
 })
 
 print(pinguinos.to_string(index=False))
+
+# Ver las primeras filas
+print(pinguinos.head())
+
+
+# Ver las últimas filas
+print(pinguinos.tail())
+
+# Información general del DataFrame
+print(pinguinos.info())
+
+# Estadísticas descriptivas
+print(pinguinos.describe())
+
+# Ver columnas
+print(pinguinos.columns)
+
+# Filtrar filas por condición
+filtro = pinguinos[pinguinos["edad"] > 30]
+print(filtro)
+
+# Seleccionar columnas específicas
+print(df[["nombre", "edad"]])
+
+# Contar valores únicos
+print(df["ciudad"].value_counts())
+
+# Eliminar valores nulos
+df = df.dropna()
+
+# Rellenar valores nulos
+df["edad"] = df["edad"].fillna(df["edad"].mean())
