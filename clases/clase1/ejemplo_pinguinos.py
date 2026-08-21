@@ -40,13 +40,14 @@ filtro = pinguinos[pinguinos["edad"] > 30]
 print(filtro)
 
 # Seleccionar columnas específicas
-print(df[["nombre", "edad"]])
+print(pinguinos[["nombre", "edad"]])
 
 # Contar valores únicos
-print(df["ciudad"].value_counts())
+print(pinguinos["ciudad"].value_counts())
 
 # Eliminar valores nulos
-df = df.dropna()
+pinguinos = pinguinos.dropna()
 
 # Rellenar valores nulos
-df["edad"] = df["edad"].fillna(df["edad"].mean())
+pinguinos["edad"] = pinguinos["edad"].fillna(pinguinos["edad"].mean())
+# %%
