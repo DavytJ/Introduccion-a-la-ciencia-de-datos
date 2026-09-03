@@ -1,0 +1,90 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"SeudoCodigo\"\n",
+        "format: revealjs\n",
+        "editor: visual\n",
+        "---\n",
+        "\n",
+        "---\n",
+        "\n",
+        "# 2. De la Lógica a la Práctica: Seudocódigo y Código\n",
+        "\n",
+        "---\n",
+        "\n",
+        "## 2.1 Concepto de Seudocódigo\n",
+        "- **Propósito:** Diseñar la lógica secuencial y el control de errores de un algoritmo antes de enfrentarse a la sintaxis rígida de un lenguaje.\n",
+        "- **Ventaja pedagógica:** Desconecta el razonamiento analítico de las comas, corchetes o errores sintácticos de Python o SQL.\n",
+        "- **Aplicación:** Sirve como mapa conceptual antes de implementar la ingesta o limpieza.\n",
+        "\n",
+        "---\n",
+        "\n",
+        "## 2.2 Ingesta con Control de Codificación (*Encoding*)\n",
+        "\n",
+        "::: {.columns}\n",
+        "\n",
+        "::: {.column width=\"50%\"}\n",
+        "### Seudocódigo\n",
+        "\n",
+        "```text\n",
+        "\n",
+        "INICIO Ingesta_Datos\n",
+        "\n",
+        "    IMPRIMIR \"Lectura de CSV...\"\n",
+        "\n",
+        "    INTENTAR\n",
+        "        Cargar CSV en 'df_raw' (UTF-8)\n",
+        "    SI FALLA POR CODIFICACIÓN ENTONCES\n",
+        "        IMPRIMIR \"[AVISO]: Error UTF-8, \n",
+        "                  reintentando con latin-1...\"\n",
+        "        Cargar CSV en 'df_raw' (latin-1)\n",
+        "    FIN INTENTAR\n",
+        "\n",
+        "FIN Ingesta_Datos\n",
+        "\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "::: {.column width=\"50%\"}\n",
+        "\n",
+        "### Codigo"
+      ],
+      "id": "d7583f6e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#|echo: true\n",
+        "#|eval: false\n",
+        "# 3. Ingesta de datos\n",
+        "print(\"Iniciando la lectura del archivo CSV...\")\n",
+        "\n",
+        "try:\n",
+        "    df_raw = pd.read_csv(ruta_csv, encoding=\"utf-8\")\n",
+        "except UnicodeDecodeError:\n",
+        "    # Fallback para datos abiertos en Latin-1\n",
+        "    print(\"[AVISO]: Error con UTF-8, \"\n",
+        "          \"intentando con 'latin-1'...\")\n",
+        "    df_raw = pd.read_csv(ruta_csv, encoding=\"latin-1\")"
+      ],
+      "id": "c833db5f",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

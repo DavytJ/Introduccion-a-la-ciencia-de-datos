@@ -1,0 +1,65 @@
+---
+title: "SeudoCodigo"
+format: revealjs
+editor: visual
+---
+
+---
+
+# 2. De la Lógica a la Práctica: Seudocódigo y Código
+
+---
+
+## 2.1 Concepto de Seudocódigo
+- **Propósito:** Diseñar la lógica secuencial y el control de errores de un algoritmo antes de enfrentarse a la sintaxis rígida de un lenguaje.
+- **Ventaja pedagógica:** Desconecta el razonamiento analítico de las comas, corchetes o errores sintácticos de Python o SQL.
+- **Aplicación:** Sirve como mapa conceptual antes de implementar la ingesta o limpieza.
+
+---
+
+## 2.2 Ingesta con Control de Codificación (*Encoding*)
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Seudocódigo
+
+```text
+
+INICIO Ingesta_Datos
+
+    IMPRIMIR "Lectura de CSV..."
+
+    INTENTAR
+        Cargar CSV en 'df_raw' (UTF-8)
+    SI FALLA POR CODIFICACIÓN ENTONCES
+        IMPRIMIR "[AVISO]: Error UTF-8, 
+                  reintentando con latin-1..."
+        Cargar CSV en 'df_raw' (latin-1)
+    FIN INTENTAR
+
+FIN Ingesta_Datos
+
+```
+
+:::
+
+::: {.column width="50%"}
+
+### Codigo
+
+```{python}
+#|echo: true
+#|eval: false
+# 3. Ingesta de datos
+print("Iniciando la lectura del archivo CSV...")
+
+try:
+    df_raw = pd.read_csv(ruta_csv, encoding="utf-8")
+except UnicodeDecodeError:
+    # Fallback para datos abiertos en Latin-1
+    print("[AVISO]: Error con UTF-8, "
+          "intentando con 'latin-1'...")
+    df_raw = pd.read_csv(ruta_csv, encoding="latin-1")
+```
+
