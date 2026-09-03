@@ -1,10 +1,18 @@
 ---
 title: "SeudoCodigo"
-format: revealjs
+format:
+  revealjs:
+    slide-level: 2
+    scrollable: true
 editor: visual
 ---
 
----
+
+# 1. Programación
+
+- Un programa de computador es esencialmente una serie de acciones que se deben ejecutar en un orden determinado para lograr de esta forma el resultado deseado.
+
+
 
 # 2. De la Lógica a la Práctica: Seudocódigo y Código
 
@@ -19,9 +27,8 @@ editor: visual
 
 ## 2.2 Ingesta con Control de Codificación (*Encoding*)
 
-::: {.columns}
+::: {.panel-tabset}
 
-::: {.column width="50%"}
 ### Seudocódigo
 
 ```text
@@ -42,16 +49,22 @@ FIN Ingesta_Datos
 
 ```
 
-:::
-
-::: {.column width="50%"}
 
 ### Codigo
 
+```{r}
+#| echo: false
+reticulate::py_require(c("pandas", "numpy", "matplotlib"))
+```
+
+
 ```{python}
-#|echo: true
-#|eval: false
+#| echo: true
+#| eval: false
 # 3. Ingesta de datos
+
+import pandas as pd
+
 print("Iniciando la lectura del archivo CSV...")
 
 try:
@@ -63,3 +76,72 @@ except UnicodeDecodeError:
     df_raw = pd.read_csv(ruta_csv, encoding="latin-1")
 ```
 
+:::
+
+---
+
+# 3 Ejercicio crear código a partir de un seudo-código
+
+---
+
+### Seudocódigo para crear un vector
+
+```text
+INICIO Filtrar_Temperaturas
+
+    // 1. Crear el vector con datos
+    DEFINIR temperaturas = [18, 22, 15, 25, 30]
+
+    // 2. Filtrar elementos mayores a 20
+    CREAR vector_filtrado VACÍO
+
+    PARA CADA temp EN temperaturas
+        SI temp > 20 ENTONCES
+            AGREGAR temp A vector_filtrado
+        FIN SI
+    FIN PARA
+
+    IMPRIMIR vector_filtrado
+
+FIN Filtrar_Temperaturas
+```
+
+---
+
+### Código
+
+::: {.panel-tabset}
+
+#### R
+
+```{r}
+#|echo: true
+# 1. Crear el vector
+temperaturas <- c(18, 22, 15, 25, 30)
+
+# 2. Filtrado vectorizado (nativo de R)
+vector_filtrado <- temperaturas[temperaturas > 20]
+
+print(vector_filtrado)
+# Resultado: 22 25 30
+```
+
+
+#### Python 
+
+
+```{python}
+#|echo: true
+# 1. Crear la lista (vector)
+temperaturas = [18, 22, 15, 25, 30]
+
+# 2. Filtrado con comprensión de listas
+vector_filtrado = [temp for temp in temperaturas if temp > 20]
+
+print(vector_filtrado)
+# Resultado: [22, 25, 30]
+```
+
+:::
+
+---

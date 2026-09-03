@@ -116,6 +116,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -204,9 +205,13 @@
 </div>
 
 </section>
-<section class="slide level2">
-
+<section id="programación" class="title-slide slide level1 center">
+<h1>1. Programación</h1>
+<ul>
+<li>Un programa de computador es esencialmente una serie de acciones que se deben ejecutar en un orden determinado para lograr de esta forma el resultado deseado.</li>
+</ul>
 </section>
+
 <section>
 <section id="de-la-lógica-a-la-práctica-seudocódigo-y-código" class="title-slide slide level1 center">
 <h1>2. De la Lógica a la Práctica: Seudocódigo y Código</h1>
@@ -222,9 +227,10 @@
 </section>
 <section id="ingesta-con-control-de-codificación-encoding" class="slide level2">
 <h2>2.2 Ingesta con Control de Codificación (<em>Encoding</em>)</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<h3 id="seudocódigo">Seudocódigo</h3>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Seudocódigo</a></li><li><a href="#tabset-1-2">Codigo</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href="" aria-label="1"></a></span>
 <span id="cb1-2"><a href="" aria-label="2"></a>INICIO Ingesta_Datos</span>
 <span id="cb1-3"><a href="" aria-label="3"></a></span>
@@ -239,9 +245,82 @@
 <span id="cb1-12"><a href="" aria-label="12"></a>    FIN INTENTAR</span>
 <span id="cb1-13"><a href="" aria-label="13"></a></span>
 <span id="cb1-14"><a href="" aria-label="14"></a>FIN Ingesta_Datos</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div><div class="column" style="width:50%;">
+</div>
+<div id="tabset-1-2">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="" aria-label="1"></a><span class="co"># 3. Ingesta de datos</span></span>
+<span id="cb2-2"><a href="" aria-label="2"></a></span>
+<span id="cb2-3"><a href="" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-4"><a href="" aria-label="4"></a></span>
+<span id="cb2-5"><a href="" aria-label="5"></a><span class="bu">print</span>(<span class="st">"Iniciando la lectura del archivo CSV..."</span>)</span>
+<span id="cb2-6"><a href="" aria-label="6"></a></span>
+<span id="cb2-7"><a href="" aria-label="7"></a><span class="cf">try</span>:</span>
+<span id="cb2-8"><a href="" aria-label="8"></a>    df_raw <span class="op">=</span> pd.read_csv(ruta_csv, encoding<span class="op">=</span><span class="st">"utf-8"</span>)</span>
+<span id="cb2-9"><a href="" aria-label="9"></a><span class="cf">except</span> <span class="pp">UnicodeDecodeError</span>:</span>
+<span id="cb2-10"><a href="" aria-label="10"></a>    <span class="co"># Fallback para datos abiertos en Latin-1</span></span>
+<span id="cb2-11"><a href="" aria-label="11"></a>    <span class="bu">print</span>(<span class="st">"[AVISO]: Error con UTF-8, "</span></span>
+<span id="cb2-12"><a href="" aria-label="12"></a>          <span class="st">"intentando con 'latin-1'..."</span>)</span>
+<span id="cb2-13"><a href="" aria-label="13"></a>    df_raw <span class="op">=</span> pd.read_csv(ruta_csv, encoding<span class="op">=</span><span class="st">"latin-1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
 
-</div></div>
+</section></section>
+<section>
+<section id="ejercicio-crear-código-a-partir-de-un-seudo-código" class="title-slide slide level1 center">
+<h1>3 Ejercicio crear código a partir de un seudo-código</h1>
+
+</section>
+<section class="slide level2">
+
+<h3 id="seudocódigo-para-crear-un-vector">Seudocódigo para crear un vector</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="" aria-label="1"></a>INICIO Filtrar_Temperaturas</span>
+<span id="cb3-2"><a href="" aria-label="2"></a></span>
+<span id="cb3-3"><a href="" aria-label="3"></a>    // 1. Crear el vector con datos</span>
+<span id="cb3-4"><a href="" aria-label="4"></a>    DEFINIR temperaturas = [18, 22, 15, 25, 30]</span>
+<span id="cb3-5"><a href="" aria-label="5"></a></span>
+<span id="cb3-6"><a href="" aria-label="6"></a>    // 2. Filtrar elementos mayores a 20</span>
+<span id="cb3-7"><a href="" aria-label="7"></a>    CREAR vector_filtrado VACÍO</span>
+<span id="cb3-8"><a href="" aria-label="8"></a></span>
+<span id="cb3-9"><a href="" aria-label="9"></a>    PARA CADA temp EN temperaturas</span>
+<span id="cb3-10"><a href="" aria-label="10"></a>        SI temp &gt; 20 ENTONCES</span>
+<span id="cb3-11"><a href="" aria-label="11"></a>            AGREGAR temp A vector_filtrado</span>
+<span id="cb3-12"><a href="" aria-label="12"></a>        FIN SI</span>
+<span id="cb3-13"><a href="" aria-label="13"></a>    FIN PARA</span>
+<span id="cb3-14"><a href="" aria-label="14"></a></span>
+<span id="cb3-15"><a href="" aria-label="15"></a>    IMPRIMIR vector_filtrado</span>
+<span id="cb3-16"><a href="" aria-label="16"></a></span>
+<span id="cb3-17"><a href="" aria-label="17"></a>FIN Filtrar_Temperaturas</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section class="slide level2">
+
+<h3 id="código">Código</h3>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">R</a></li><li><a href="#tabset-2-2">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22 25 30</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-2">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[22, 25, 30]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+
 </section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
@@ -458,6 +537,82 @@
         ]
       });
     </script>
+    
+
+    <script>
+
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+
+      // slide changes (different for each slide format).
+
+      (function () {
+
+        // dispatch for htmlwidgets
+
+        function fireSlideEnter() {
+
+          const event = window.document.createEvent("Event");
+
+          event.initEvent("slideenter", true, true);
+
+          window.document.dispatchEvent(event);
+
+        }
+
+    
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          fireSlideEnter();
+
+    
+
+          // dispatch for shiny
+
+          if (window.jQuery) {
+
+            if (previousSlide) {
+
+              window.jQuery(previousSlide).trigger("hidden");
+
+            }
+
+            if (currentSlide) {
+
+              window.jQuery(currentSlide).trigger("shown");
+
+            }
+
+          }
+
+        }
+
+    
+
+        // hookup for slidy
+
+        if (window.w3c_slidy) {
+
+          window.w3c_slidy.add_observer(function (slide_num) {
+
+            // slide_num starts at position 1
+
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+
+          });
+
+        }
+
+    
+
+      })();
+
+    </script>
+
+    
+
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {
         const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
