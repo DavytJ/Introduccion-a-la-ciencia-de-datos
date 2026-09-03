@@ -137,8 +137,9 @@ library(readr)
 # 1. Construir la ruta relativa hacia el archivo CSV
 # Estructura esperada: tu_proyecto/data/raw/datos.csv
 archivo <- "cantidad_de_residuos_en_la_estacion_de_transferencia_2023.csv"
+ruta_csv <- here(archivo)
 ruta_csv <- here("clases", "clase4", archivo)
-
+ruta_csv
 # 2. Verificar que el archivo exista
 if (!file.exists(ruta_csv)) {
   stop(paste("No se encontró el archivo en:", ruta_csv))
@@ -220,6 +221,8 @@ Actividades esenciales:
 
 
 ::: panel-tabset
+
+## R
 ```{r}
 #| echo: true
 # dimensiones y estructura de los datos
@@ -232,7 +235,7 @@ length(unique(df$matricula_letra)) #¿cuál es la columna identificador?
 #Ejercicio identificar la variable ID
 ```
 
-
+## Python
 ```{python}
 #| echo: true
 #| eval: false
@@ -250,21 +253,38 @@ df["matricula_letra"].nunique()
 
 ## Data profiling 2: valores faltantes{.scrollable}
 
+::: panel-tabset
+## R
 ```{r}
 #| echo: true
 colSums(is.na(df)) # Conteo de NA por columna
 sapply(df, function(x) sum(x == "" | x == "N/A", na.rm = TRUE)) # Falsos nulos
 ```
 
+## Python
+```{python}
+#| echo: true
+#| eval: false
+df.isnull().sum()  # Conteo de NA por columna
+(df == "").sum()   # Falsos nulos (cadenas vacías)
+```
+
+:::
+
 ## Data profiling 3: duplicados{.scrollable}
 
+::: panel-tabset
+## R
 ```{r}
 #| echo: true
 sum(duplicated(df)) # Cantidad de filas exactamente iguales
 ```
+
+## Python
 ```{python}
 #| echo: true
 #| eval: false
 df.duplicated().sum() # Cantidad de filas exactamente iguales
 ```
 
+:::
