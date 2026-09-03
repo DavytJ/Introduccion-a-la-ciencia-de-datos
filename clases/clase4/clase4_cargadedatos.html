@@ -474,16 +474,131 @@ Joselina Davyt
 <section id="data-profiling-identificador" class="slide level2 scrollable">
 <h2>Data profiling: identificador</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">R</a></li><li><a href="#tabset-4-2">Python</a></li></ul>
 <div class="tab-content">
-
+<div id="tabset-4-1">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="" aria-label="1"></a><span class="co"># dimensiones y estructura de los datos</span></span>
+<span id="cb16-2"><a href="" aria-label="2"></a><span class="fu">str</span>(df) <span class="co"># 1222 filas y 41 columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [1,222 × 41] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ pesada               : num [1:1222] 4e+06 4e+06 4e+06 4e+06 4e+06 ...
+ $ fecha_dia            : chr [1:1222] "30/11/23 00:00" "30/11/23 00:00" "30/11/23 00:00" "30/11/23 00:00" ...
+ $ fecha                : chr [1:1222] "30/11/23 08:28" "30/11/23 08:30" "30/11/23 08:36" "30/11/23 08:56" ...
+ $ matricula_letra      : chr [1:1222] "SIM" "SIM" "SIM" "SIM" ...
+ $ tipo_residuo         : num [1:1222] 1 1 1 1 1 1 1 1 1 1 ...
+ $ tipo_residuo_desc    : chr [1:1222] "TIPO DOMICILIARIO" "TIPO DOMICILIARIO" "TIPO DOMICILIARIO" "TIPO DOMICILIARIO" ...
+ $ subtipo_residuo      : num [1:1222] 1 1 1 1 1 1 1 1 1 1 ...
+ $ subtipo_residuo_desc : chr [1:1222] "ASIMILABLE A DOMICILIARIO" "ASIMILABLE A DOMICILIARIO" "ASIMILABLE A DOMICILIARIO" "ASIMILABLE A DOMICILIARIO" ...
+ $ peso_neto            : num [1:1222] 11590 8660 6090 7920 9740 ...
+ $ peso_bruto           : num [1:1222] 28450 26070 25020 24720 26890 ...
+ $ tara                 : num [1:1222] 16860 17410 18930 16800 17150 ...
+ $ balanza              : num [1:1222] 5 5 5 5 5 5 5 5 5 5 ...
+ $ medio_transp         : num [1:1222] 1 1 50 1 1 50 1 1 1 50 ...
+ $ medio_transp_desc    : chr [1:1222] "COMPACTADOR LEVANTE LAT." "COMPACTADOR LEVANTE LAT." "COMPACTADOR LAT.CAJA DESM" "COMPACTADOR LEVANTE LAT." ...
+ $ trayecto             : logi [1:1222] NA NA NA NA NA NA ...
+ $ trayecto_desc        : logi [1:1222] NA NA NA NA NA NA ...
+ $ tipo_recorrido       : logi [1:1222] NA NA NA NA NA NA ...
+ $ tipo_recorrido_desc  : logi [1:1222] NA NA NA NA NA NA ...
+ $ tipo_volcado_desc    : chr [1:1222] "SIN PERMISO" "SIN PERMISO" "SIN PERMISO" "SIN PERMISO" ...
+ $ nomenclatura_circuito: logi [1:1222] NA NA NA NA NA NA ...
+ $ municipio            : logi [1:1222] NA NA NA NA NA NA ...
+ $ lugar_salida         : logi [1:1222] NA NA NA NA NA NA ...
+ $ lugar_salida_desc    : logi [1:1222] NA NA NA NA NA NA ...
+ $ permiso              : logi [1:1222] NA NA NA NA NA NA ...
+ $ nro_permiso          : num [1:1222] NA NA NA NA NA NA NA NA NA NA ...
+ $ permiso_id           : num [1:1222] NA NA NA NA NA NA NA NA NA NA ...
+ $ tipo_permiso         : num [1:1222] NA NA NA NA NA NA NA NA NA NA ...
+ $ tipo_permiso_desc    : chr [1:1222] NA NA NA NA ...
+ $ peso_autorizado      : logi [1:1222] NA NA NA NA NA NA ...
+ $ destino_volcado      : num [1:1222] 34 34 34 34 34 34 34 34 34 34 ...
+ $ destino_volcado_desc : chr [1:1222] "ETRA (Estacion de Transferencia)" "ETRA (Estacion de Transferencia)" "ETRA (Estacion de Transferencia)" "ETRA (Estacion de Transferencia)" ...
+ $ tipo_pesada          : num [1:1222] 1 1 1 1 1 1 1 1 1 1 ...
+ $ tipo_pesada_desc     : chr [1:1222] "AUTOMATICA" "AUTOMATICA" "AUTOMATICA" "AUTOMATICA" ...
+ $ basura_propia        : chr [1:1222] "NO" "NO" "NO" "NO" ...
+ $ fmod                 : chr [1:1222] "16/01/24 10:41" "16/01/24 10:41" "16/01/24 10:41" "16/01/24 10:41" ...
+ $ viaje_fecha          : chr [1:1222] "29/11/23 00:00" "29/11/23 00:00" "30/11/23 00:00" "30/11/23 00:00" ...
+ $ fecha_tara           : chr [1:1222] "30/11/23 08:39" "30/11/23 08:40" "30/11/23 08:53" "30/11/23 09:15" ...
+ $ sitio                : num [1:1222] 2 2 2 2 2 2 2 2 2 2 ...
+ $ sitio_desc           : chr [1:1222] "ETRA" "ETRA" "ETRA" "ETRA" ...
+ $ tipo_movimiento      : num [1:1222] 1 1 1 1 1 1 1 1 1 1 ...
+ $ tipo_movimiento_desc : chr [1:1222] "DESCARGA" "DESCARGA" "DESCARGA" "DESCARGA" ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   pesada = col_double(),
+  ..   fecha_dia = col_character(),
+  ..   fecha = col_character(),
+  ..   matricula_letra = col_character(),
+  ..   tipo_residuo = col_double(),
+  ..   tipo_residuo_desc = col_character(),
+  ..   subtipo_residuo = col_double(),
+  ..   subtipo_residuo_desc = col_character(),
+  ..   peso_neto = col_double(),
+  ..   peso_bruto = col_double(),
+  ..   tara = col_double(),
+  ..   balanza = col_double(),
+  ..   medio_transp = col_double(),
+  ..   medio_transp_desc = col_character(),
+  ..   trayecto = col_logical(),
+  ..   trayecto_desc = col_logical(),
+  ..   tipo_recorrido = col_logical(),
+  ..   tipo_recorrido_desc = col_logical(),
+  ..   tipo_volcado_desc = col_character(),
+  ..   nomenclatura_circuito = col_logical(),
+  ..   municipio = col_logical(),
+  ..   lugar_salida = col_logical(),
+  ..   lugar_salida_desc = col_logical(),
+  ..   permiso = col_logical(),
+  ..   nro_permiso = col_double(),
+  ..   permiso_id = col_double(),
+  ..   tipo_permiso = col_double(),
+  ..   tipo_permiso_desc = col_character(),
+  ..   peso_autorizado = col_logical(),
+  ..   destino_volcado = col_double(),
+  ..   destino_volcado_desc = col_character(),
+  ..   tipo_pesada = col_double(),
+  ..   tipo_pesada_desc = col_character(),
+  ..   basura_propia = col_character(),
+  ..   fmod = col_character(),
+  ..   viaje_fecha = col_character(),
+  ..   fecha_tara = col_character(),
+  ..   sitio = col_double(),
+  ..   sitio_desc = col_character(),
+  ..   tipo_movimiento = col_double(),
+  ..   tipo_movimiento_desc = col_character()
+  .. )
+ - attr(*, "problems")=&lt;pointer: 0x000002b2840f6860&gt; </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="" aria-label="1"></a><span class="co"># filas únicas: detectando la columna que contiene el ID</span></span>
+<span id="cb18-2"><a href="" aria-label="2"></a><span class="fu">length</span>(<span class="fu">unique</span>(df<span class="sc">$</span>matricula_letra)) <span class="co">#¿cuál es la columna identificador?</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 12</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-4-2">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb20-2"><a href="" aria-label="2"></a></span>
+<span id="cb20-3"><a href="" aria-label="3"></a><span class="co"># 1. Dimensiones y estructura de los datos (Equivalente a str(df))</span></span>
+<span id="cb20-4"><a href="" aria-label="4"></a>df.info()</span>
+<span id="cb20-5"><a href="" aria-label="5"></a><span class="co"># Nota: df.shape te da exactamente las dimensiones (filas, columnas) -&gt; (1222, 41)</span></span>
+<span id="cb20-6"><a href="" aria-label="6"></a></span>
+<span id="cb20-7"><a href="" aria-label="7"></a><span class="co"># 2. Filas únicas: detectando la columna que contiene el ID (Equivalente a length(unique(...)))</span></span>
+<span id="cb20-8"><a href="" aria-label="8"></a>df[<span class="st">"matricula_letra"</span>].nunique()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
 </div>
 </div>
 </section>
 <section id="data-profiling-2-valores-faltantes" class="slide level2 scrollable">
 <h2>Data profiling 2: valores faltantes</h2>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">R</a></li><li><a href="#tabset-5-2">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="" aria-label="1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(df)) <span class="co"># Conteo de NA por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="" aria-label="1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(df)) <span class="co"># Conteo de NA por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               pesada             fecha_dia                 fecha 
                     0                     0                     0 
@@ -514,7 +629,7 @@ Joselina Davyt
       tipo_movimiento  tipo_movimiento_desc 
                     0                     0 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="" aria-label="1"></a><span class="fu">sapply</span>(df, <span class="cf">function</span>(x) <span class="fu">sum</span>(x <span class="sc">==</span> <span class="st">""</span> <span class="sc">|</span> x <span class="sc">==</span> <span class="st">"N/A"</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="co"># Falsos nulos</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="" aria-label="1"></a><span class="fu">sapply</span>(df, <span class="cf">function</span>(x) <span class="fu">sum</span>(x <span class="sc">==</span> <span class="st">""</span> <span class="sc">|</span> x <span class="sc">==</span> <span class="st">"N/A"</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="co"># Falsos nulos</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               pesada             fecha_dia                 fecha 
                     0                     0                     0 
@@ -546,17 +661,35 @@ Joselina Davyt
                     0                     0 </code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-5-2">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="" aria-label="1"></a>df.isnull().<span class="bu">sum</span>()  <span class="co"># Conteo de NA por columna</span></span>
+<span id="cb25-2"><a href="" aria-label="2"></a>(df <span class="op">==</span> <span class="st">""</span>).<span class="bu">sum</span>()   <span class="co"># Falsos nulos (cadenas vacías)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="data-profiling-3-duplicados" class="slide level2 scrollable">
 <h2>Data profiling 3: duplicados</h2>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">R</a></li><li><a href="#tabset-6-2">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="" aria-label="1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(df)) <span class="co"># Cantidad de filas exactamente iguales</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="" aria-label="1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(df)) <span class="co"># Cantidad de filas exactamente iguales</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-6-2">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="" aria-label="1"></a>df.duplicated().<span class="bu">sum</span>() <span class="co"># Cantidad de filas exactamente iguales</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="" aria-label="1"></a>df.duplicated().<span class="bu">sum</span>() <span class="co"># Cantidad de filas exactamente iguales</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
 </div>
 
 </section>

@@ -1,0 +1,147 @@
+---
+title: "SeudoCodigo"
+format:
+  revealjs:
+    slide-level: 2
+    scrollable: true
+editor: visual
+---
+
+
+# 1. Programación
+
+- Un programa de computador es esencialmente una serie de acciones que se deben ejecutar en un orden determinado para lograr de esta forma el resultado deseado.
+
+
+
+# 2. De la Lógica a la Práctica: Seudocódigo y Código
+
+---
+
+## 2.1 Concepto de Seudocódigo
+- **Propósito:** Diseñar la lógica secuencial y el control de errores de un algoritmo antes de enfrentarse a la sintaxis rígida de un lenguaje.
+- **Ventaja pedagógica:** Desconecta el razonamiento analítico de las comas, corchetes o errores sintácticos de Python o SQL.
+- **Aplicación:** Sirve como mapa conceptual antes de implementar la ingesta o limpieza.
+
+---
+
+## 2.2 Ingesta con Control de Codificación (*Encoding*)
+
+::: {.panel-tabset}
+
+### Seudocódigo
+
+```text
+
+INICIO Ingesta_Datos
+
+    IMPRIMIR "Lectura de CSV..."
+
+    INTENTAR
+        Cargar CSV en 'df_raw' (UTF-8)
+    SI FALLA POR CODIFICACIÓN ENTONCES
+        IMPRIMIR "[AVISO]: Error UTF-8, 
+                  reintentando con latin-1..."
+        Cargar CSV en 'df_raw' (latin-1)
+    FIN INTENTAR
+
+FIN Ingesta_Datos
+
+```
+
+
+### Codigo
+
+```{r}
+#| echo: false
+reticulate::py_require(c("pandas", "numpy", "matplotlib"))
+```
+
+
+```{python}
+#| echo: true
+#| eval: false
+# 3. Ingesta de datos
+
+import pandas as pd
+
+print("Iniciando la lectura del archivo CSV...")
+
+try:
+    df_raw = pd.read_csv(ruta_csv, encoding="utf-8")
+except UnicodeDecodeError:
+    # Fallback para datos abiertos en Latin-1
+    print("[AVISO]: Error con UTF-8, "
+          "intentando con 'latin-1'...")
+    df_raw = pd.read_csv(ruta_csv, encoding="latin-1")
+```
+
+:::
+
+---
+
+# 3 Ejercicio crear código a partir de un seudo-código
+
+---
+
+### Seudocódigo para crear un vector
+
+```text
+INICIO Filtrar_Temperaturas
+
+    // 1. Crear el vector con datos
+    DEFINIR temperaturas = [18, 22, 15, 25, 30]
+
+    // 2. Filtrar elementos mayores a 20
+    CREAR vector_filtrado VACÍO
+
+    PARA CADA temp EN temperaturas
+        SI temp > 20 ENTONCES
+            AGREGAR temp A vector_filtrado
+        FIN SI
+    FIN PARA
+
+    IMPRIMIR vector_filtrado
+
+FIN Filtrar_Temperaturas
+```
+
+---
+
+### Código
+
+::: {.panel-tabset}
+
+#### R
+
+```{r}
+#|echo: true
+# 1. Crear el vector
+temperaturas <- c(18, 22, 15, 25, 30)
+
+# 2. Filtrado vectorizado (nativo de R)
+vector_filtrado <- temperaturas[temperaturas > 20]
+
+print(vector_filtrado)
+# Resultado: 22 25 30
+```
+
+
+#### Python 
+
+
+```{python}
+#|echo: true
+# 1. Crear la lista (vector)
+temperaturas = [18, 22, 15, 25, 30]
+
+# 2. Filtrado con comprensión de listas
+vector_filtrado = [temp for temp in temperaturas if temp > 20]
+
+print(vector_filtrado)
+# Resultado: [22, 25, 30]
+```
+
+:::
+
+---
