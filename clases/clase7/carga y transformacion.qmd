@@ -1,0 +1,485 @@
+---
+title: "Carga y transformacion"
+format: pdf
+editor: visual
+---
+
+## Paquetes
+
+```{r, echo=FALSE}
+paquetes <- c("ggplot2", "tidyverse", "DescTools", "readxl", "xlsx", "here", "vtable", "modelsummary", "haven", "lubridate", "patchwork", "stringr", "sf", "leaflet", "leaflet.minicharts", "webshot2")
+
+# 1. Detectar cuáles NO están instalados e instalarlos
+paquetes_faltantes <- paquetes[!(paquetes %in% installed.packages()[,"Package"])]
+if(length(paquetes_faltantes) > 0) {
+  install.packages(paquetes_faltantes)
+}
+
+# 2. Cargarlos todos silenciosamente 
+invisible(lapply(paquetes, function(pkg) {
+  suppressPackageStartupMessages(suppressWarnings(library(pkg, character.only = TRUE)))
+}))
+```
+
+## Carga de datos: ejemplo medioambiente y aire
+
+### Ozono
+
+Datos minutales de concentración de ozono (O3) en aire ambiente. 
+
+```{r}
+ozono <- read_csv(here::here("clases/clase7/o3_01_2024_04_2024.csv"),
+                        locale = locale(encoding = "latin1"))
+```
+
+### Material particulado
+
+Material particulado menor de 2,5 micras medido en estaciones automáticas
+
+```{r}
+pm <- read_csv(here::here("clases/clase7/pm_2_5_01_2024_04_2024.csv"),
+                        locale = locale(encoding = "latin1"))
+```
+
+### Conteo vehicular en las principales avenidas de Montevideo
+
+El sistema de conteo vehicular que utiliza el Centro de Gestión de Movilidad (CGM) para la medición de los volúmenes vehiculares que circulan por las arterias que se encuentran centralizadas, utiliza analíticas de video para la generación de los datos necesarios para la elaboración de planes y coordinaciones semafóricas. Los detectores miden el total de vehículos y su clasificación por largo de los mismos, por sentido de circulación, pudiendo discriminarse por carril dentro de cada sentido.
+
+```{r}
+auto <- read_csv(here::here("clases/clase7/autoscope_04_2024_volumen.csv"),
+                        locale = locale(encoding = "latin1"))
+```
+
+## Data profiling: id, nulos y duplicados
+
+### Información básica del dataset
+
+```{r}
+str(ozono)
+```
+
+
+### Identificador
+
+Para el caso del ozono los datos se toman por estación (que tiene una ubicación geográfica, es decir, es una característica de la estación) y por fecha.
+
+El identificador podría ser la fecha. ¿Por qué? Porque sirve para unir con otros datos.
+
+También podría ser una combinación de fecha y estación.
+
+1- Tenemos problemas con los valores de las estaciones
+```{r}
+ozono[1:10,3]
+```
+```{r}
+unique(ozono$estacion)
+```
+```{r}
+# 1. Creamos el diccionario de traducción (Busca = Reemplaza)
+pauta_limpieza <- c(
+  "Ã³" = "o",
+  "Ã±" = "ni",
+  "Ã¡" = "á",
+  "Ã©" = "é",
+  "Ã­" = "í",
+  "Ãº" = "ú",
+  "Ã“" = "Ó",
+  "Ã‘" = "NI",
+  "Ã"  = "í" # Nota: a veces la 'í' sola se rompe así, déjala al final de la lista
+)
+
+# 2. Aplicamos la limpieza a tu columna
+ozono_limpio <- ozono %>%
+  mutate(
+    # Cambia 'tu_columna' por el nombre real de tu columna
+    estacion = str_replace_all(estacion, pauta_limpieza)
+  )
+```
+
+### Valores faltantes
+
+```{r}
+colSums(is.na(ozono))
+```
+
+La única variable que tiene valores faltantes es la medición, por lo tanto se pueden eliminar los valores faltantes, ya que no eliminamos identificador (podría discutirse si hay que eliminar fechas sin registro).
+
+Quito los NA de todo el dataset (si hubieran más columnas con NA también quita esa fila):
+
+```{r}
+ozono_sinna <- ozono_limpio %>%
+  na.omit()
+```
+
+Quito los NA de columnas especificas:
+
+```{r}
+ozono_sinna <- ozono_limpio %>%
+  filter(is.na(o3) != TRUE)
+```
+
+### Duplicados
+
+Para saber rápidamente el número total de filas repetidas en todo tu dataset:
+
+```{r}
+ozono_sinna %>% 
+  duplicated() %>% 
+  sum()
+```
+
+Mostrar solo las filas que están repetidas y ver qué tienen dentro
+
+```{r}
+# Si quieres ver TODAS las filas involucradas en el duplicado (la primera y sus copias):
+ozono_repetidas <- ozono_sinna %>% 
+  filter(duplicated(.) | duplicated(., fromLast = TRUE))
+```
+
+### Eliminar duplicados
+
+```{r}
+# Conserva solo la primera aparición de cada fila única
+dataset_sindup <- ozono_sinna %>% 
+  distinct()
+
+# Si quieres eliminar duplicados basados solo en una columna (ej. 'nombre_barrio') 
+# y conservar el resto de las columnas del primer registro:
+dataset_sindup_columna <- ozono_sinna %>% 
+  distinct(estacion, .keep_all = TRUE)
+```
+
+## Tipos de datos y transformación de datos
+
+### Fechas
+
+El formato "POSIXct" "POSIXt" representan el formato estándar para manejar fechas y horas exactas (lo que en programación se conoce como Timestamp o Datetime)
+
+```{r}
+class(ozono$fecha)
+```
+
+1. ¿Qué es POSIXct? (La clase real) La ct significa calendar time (tiempo de calendario).Internamente, R guarda esta variable como un número entero: la cantidad de segundos que han pasado desde el 1 de enero de 1970 hasta ese momento. Al ser un número por dentro, es un formato extremadamente rápido y eficiente para hacer cálculos (por ejemplo, restar dos fechas para saber cuántas horas o días pasaron).
+
+2. ¿Qué es "POSIXt"? (La clase heredada). Es una "superclase" virtual de R. Solo sirve para que R sepa que esa variable es un formato de tiempo y que puede usar con ella funciones de fechas (como sumarle días, extraer el mes, etc.)
+
+### Crear variables 
+
+```{r}
+ozono_new <- ozono_sinna %>%
+ mutate(
+    anio = lubridate::year(fecha),
+    mes  = lubridate::month(fecha),
+    hora = lubridate::hour(fecha)
+  )
+```
+
+## Generación de información
+
+### Agregación mensual
+
+```{r}
+ozono_mes <- ozono_new %>%
+  group_by(mes) %>%
+  summarise(
+    o3_medio_mes = mean(o3),
+    n_registros_mes = n())
+```
+
+*Visualización*
+
+```{r}
+ozono_mes %>%
+ggplot(aes(x = mes, y = o3_medio_mes)) +
+  geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
+  geom_point(color = "red", size = 3) +       # Dibuja los puntos individuales
+  theme_minimal() +                           # Aplica un diseño limpio
+  labs(
+    title = "Concentración de Ozono en el ambiente, por mes, 2024",
+    x = "Fecha",
+    y = "Valores"
+  )
+  
+```
+
+
+### Partes básicas de un gráfico:
+
+- dataset
+
+- variable eje x
+
+- variable eje y 
+
+- tipo de gráfico
+
+- títulos: del gráfico y nombres de los ejes
+
+Información completa en Cheetsheet: https://ggplot2.tidyverse.org/
+
+
+
+## Análisis profundo: Agregación temporal: minutal -> horario -> diario
+
+Pregunta central: al agregar, ¿qué estadístico representa el fenómeno?
+
+- media: nivel típico
+
+- máximo: episodios puntuales (sensible a errores del sensor)
+
+- percentil 95: episodios altos pero robusto a picos aislados
+
+- n: cuántos minutos respaldan el valor agregado (cobertura)
+ 
+
+### *Horario*
+
+```{r}
+ozono_hora <- ozono_sinna %>%
+  mutate(fecha_hora = floor_date(fecha, unit = "hour")) %>%
+  group_by(estacion, fecha_hora) %>%
+  summarise(
+    media  = mean(o3),
+    maximo = max(o3),
+    p95    = quantile(o3, 0.95),
+    n_min  = n(),               # de un máximo de 60
+    .groups = "drop"
+  )
+```
+
+
+```{r}
+ozono_hora %>%
+ggplot(aes(x = fecha_hora, y = media)) +
+  geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
+  geom_point(color = "red", size = 1) +       # Dibuja los puntos individuales
+  theme_minimal() +                           # Aplica un diseño limpio
+  labs(
+    title = "Concentración de Ozono en el ambiente, por hora, 2024",
+    x = "Fecha",
+    y = "Valores"
+  )
+```
+
+## Teoría estadística
+
+```{r}
+source(here::here("clases/clase7/estadistica_basica.R"))
+```
+```{r}
+pA
+```
+```{r}
+pB
+```
+*Densidad*
+
+Int
+
+$$h_i = f_i/a_i$$
+
+```{r}
+pC
+```
+
+```{r}
+pD
+```
+
+Qué pasa si hay algunos datos outliers o espúreos
+
+```{r}
+pE
+```
+
+
+### *Diario*
+
+```{r}
+ozono_dia <- ozono_sinna %>%
+  mutate(dia = as_date(fecha)) %>%
+  group_by(estacion, dia) %>%
+  summarise(
+    media  = mean(o3),
+    maximo = max(o3),
+    p95    = quantile(o3, 0.95),
+    n_min  = n(),               # de un máximo de 1440
+    .groups = "drop"
+  )
+```
+
+```{r}
+ozono_dia %>%
+ggplot(aes(x = dia, y = media)) +
+  geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
+  geom_point(color = "red", size = 1) +       # Dibuja los puntos individuales
+  theme_minimal() +                           # Aplica un diseño limpio
+  labs(
+    title = "Concentración de Ozono en el ambiente, por hora, 2024",
+    x = "Fecha",
+    y = "Valores"
+  )
+```
+
+ 
+Las tres curvas cuentan historias distintas sobre el mismo día
+
+```{r}
+ozono_dia %>%
+  pivot_longer(c(media, p95, maximo), names_to = "estadistico", values_to = "o3") %>%
+  ggplot(aes(x = dia, y = o3, color = estadistico)) +
+  geom_line() +
+  facet_wrap(~ estacion, ncol = 1, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Agregación diaria: media, p95 y máximo por estación",
+       x = NULL, y = "O3 (µg/m³)")
+```
+
+
+ 
+El estadístico normativo: máximo diario de la media móvil de 8 horas
+Las guías OMS (2021) para O3 usan el máximo diario de la media móvil de 8 h.
+Una media móvil requiere una grilla horaria COMPLETA: si faltan horas, la
+ventana de 8 posiciones deja de ser una ventana de 8 horas.
+
+```{r}
+grilla_horaria <- seq(min(ozono_hora$fecha_hora), max(ozono_hora$fecha_hora), by = "hour")
+```
+
+```{r}
+ozono_8h <- ozono_hora %>%
+  select(estacion, fecha_hora, media) %>%
+  complete(estacion, fecha_hora = grilla_horaria) %>%   # inserta NA en horas ausentes
+  arrange(estacion, fecha_hora) %>%
+  group_by(estacion) %>%
+  mutate(
+    # stats::filter, no dplyr::filter (mismo nombre, función distinta)
+    media_8h = as.numeric(stats::filter(media, rep(1 / 8, 8), sides = 1))
+  ) %>%
+  ungroup()
+ 
+max_8h_dia <- ozono_8h %>%
+  mutate(dia = as_date(fecha_hora)) %>%
+  group_by(estacion, dia) %>%
+  summarise(
+    max_8h  = if (all(is.na(media_8h))) NA_real_ else max(media_8h, na.rm = TRUE),
+    horas_validas = sum(!is.na(media_8h)),
+    .groups = "drop"
+  )
+
+ggplot(max_8h_dia, aes(x = dia, y = max_8h, color = estacion)) +
+  geom_line() +
+  geom_hline(yintercept = 100, linetype = "dashed") +   # guía OMS 2021: 100 µg/m³
+  theme_minimal() +
+  labs(title = "Máximo diario de la media móvil de 8 h",
+       x = NULL, y = "O3 (µg/m³)")
+```
+
+```{r}
+source(here::here("clases/clase7/mapa.R"))
+```
+
+
+```{r}
+#| label: fig-mapa
+#| fig-cap: "Ozono en Montevideo, ene–abr 2024"
+#| fig-width: 8
+#| fig-height: 6
+#| screenshot.opts: !expr list(delay = 3, vwidth = 1000, vheight = 750)
+mapa
+```
+
+
+## Profundización: Patrones de datos faltantes
+
+Tres tipos de faltante en una serie de sensor:
+
+a) explícito: la fila existe, o3 es NA
+
+b) en rachas: muchos NA consecutivos -> sensor caído o en mantenimiento
+
+c) implícito: la fila no existe (el minuto no está en el archivo)
+
+ 
+### Faltantes explícitos por estación
+
+Cada estación debería de tener 172.800 minutos
+
+```{r}
+ozono_limpio %>%
+  group_by(estacion) %>%
+  summarise(
+    n_filas  = n(),
+    n_na     = sum(is.na(o3)),
+    prop_na  = mean(is.na(o3)),
+    .groups = "drop"
+  )
+```
+
+
+ 
+```{r}
+## 9.2 ¿Cuándo faltan? Proporción de NA por día
+na_dia <- ozono_limpio %>%
+  mutate(dia = as_date(fecha)) %>%
+  group_by(estacion, dia) %>%
+  summarise(prop_na = mean(is.na(o3)), .groups = "drop")
+ 
+ggplot(na_dia, aes(x = dia, y = prop_na)) +
+  geom_col(fill = "grey40") +
+  facet_wrap(~ estacion, ncol = 1) +
+  theme_minimal() +
+  labs(title = "Proporción de minutos sin dato, por día y estación",
+       x = NULL, y = "Proporción de NA")
+```
+
+```{r}
+## 9.3 Rachas de NA consecutivos (rle = run length encoding)
+rachas <- ozono_limpio %>%
+  arrange(estacion, fecha) %>%
+  group_by(estacion) %>%
+  reframe({
+    r <- rle(is.na(o3))
+    tibble(faltante = r$values, largo = r$lengths)
+  })
+ 
+rachas %>%
+  filter(faltante) %>%
+  mutate(tipo = cut(largo, breaks = c(0, 1, 10, 60, 1440, Inf),
+                    labels = c("1 min", "2-10 min", "11 min-1 h", "1 h-1 día", "> 1 día"))) %>%
+  count(estacion, tipo, name = "n_rachas")
+```
+
+
+```{r}
+## 9.4 Faltantes implícitos: minutos que no están en el archivo
+ozono_limpio %>%
+  group_by(estacion) %>%
+  summarise(
+    primero   = min(fecha),
+    ultimo    = max(fecha),
+    esperados = as.numeric(difftime(max(fecha), min(fecha), units = "mins")) + 1,
+    presentes = n_distinct(fecha),
+    .groups = "drop"
+  ) %>%
+  mutate(implicitos = esperados - presentes,
+         prop_implicitos = implicitos / esperados)
+```
+
+```{r}
+INICIO <- as.POSIXct("2024-01-01 00:00:00", tz = tz(ozono_limpio$fecha))
+FIN    <- as.POSIXct("2024-04-30 23:59:00", tz = tz(ozono_limpio$fecha))
+ESPERADOS <- as.numeric(difftime(FIN, INICIO, units = "mins")) + 1
+
+cobertura <- ozono_limpio %>%
+  group_by(estacion) %>%
+  summarise(presentes = n_distinct(fecha),
+            validos   = sum(!is.na(o3)),
+            .groups = "drop") %>%
+  mutate(esperados         = ESPERADOS,
+         sin_fila          = esperados - presentes,
+         fila_sin_medicion = presentes - validos,
+         cobertura         = 100*round(validos / esperados, 3))
+cobertura
+```
+ 
