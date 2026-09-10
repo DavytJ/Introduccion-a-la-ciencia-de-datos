@@ -3,6 +3,7 @@ EJEMPLO — Un conjunto de datos famoso: los pingüinos de Palmer
 Diez filas reales del dataset "penguins" (Horst, Hill y Gorman, 2020),
 escritas a mano para no depender de la red.
 """
+
 # %%
 import pandas as pd
 
@@ -16,6 +17,7 @@ pinguinos = pd.DataFrame({
     "largo_aleta_mm":   [181, 186, 174, 178, 192, 196, 193, 211, 230, 210],
     "masa_corporal_g":  [3750, 3800, 3400, 3250, 3500, 3900, 3650, 4500, 5700, 4450],
 })
+
 
 print(pinguinos.to_string(index=False))
 
