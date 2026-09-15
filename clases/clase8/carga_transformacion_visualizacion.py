@@ -8,7 +8,7 @@
 # =============================================================================
 #%%
 from pathlib import Path
-
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -157,6 +157,7 @@ ax.grid(alpha=0.3)
 for lado in ("top", "right"):
     ax.spines[lado].set_visible(False)
 plt.tight_layout()
+fig.savefig("ozono_2024.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # Partes básicas de un gráfico:
@@ -166,7 +167,26 @@ plt.show()
 #   - tipo de gráfico
 #   - títulos: del gráfico y nombres de los ejes
 
+def grafico_ozono(datos, color_puntos="red", color_linea="blue", ylim=(0, 40)):
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(datos["mes"], datos["o3_medio_mes"], color=color_linea, linewidth=2)
+    ax.scatter(datos["mes"], datos["o3_medio_mes"], color=color_puntos, s=60, zorder=3)
+    ax.set_xticks(datos["mes"])
+    ax.set_xticklabels(["Ene", "Feb", "Mar", "Abr"])
+    ax.set(title="Ozono troposférico: media mensual, enero a abril de 2024",
+           xlabel="Mes (2024)", ylabel="Ozono (µg/m³)")
+    ax.set_ylim(*ylim)
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+    fig.tight_layout()
+    return fig, ax
 
+plt.close("all")
+
+fig, ax = grafico_ozono(ozono_mes, color_puntos="green")
+fig.savefig("ozono_verde.png", dpi=300, bbox_inches="tight")
+plt.show()
 # =============================================================================
 # 5. Análisis profundo: agregación temporal minutal -> horario -> diario
 # =============================================================================
@@ -202,19 +222,8 @@ for lado in ("top", "right"):
 plt.tight_layout()
 plt.show()
 
-
 # =============================================================================
-# 6. Teoría estadística
-# =============================================================================
-# Los paneles se construyen en un script aparte, que guarda las dos figuras.
-# runpy.run_path es el equivalente de source() de R.
-runpy.run_path(str(CLASE / "estadistica_basica.py"))
-
-# Densidad:  h_i = f_i / a_i
-
-
-# =============================================================================
-# 7. Diario
+# 6. Diario
 # =============================================================================
 ozono_dia = (
     ozono_sinna
@@ -253,7 +262,7 @@ plt.show()
 
 
 # =============================================================================
-# 8. El estadístico normativo: máximo diario de la media móvil de 8 horas
+# 7. Avanzado: máximo diario de la media móvil de 8 horas
 # =============================================================================
 # Las guías OMS (2021) para O3 usan el máximo diario de la media móvil de 8 h.
 # Una media móvil requiere una grilla horaria COMPLETA: si faltan horas, la
@@ -296,15 +305,8 @@ ax.grid(alpha=0.3)
 plt.tight_layout()
 plt.show()
 
-
 # =============================================================================
-# 9. Mapa
-# =============================================================================
-runpy.run_path(str(CLASE / "mapa.py"))
-
-
-# =============================================================================
-# 10. Patrones de faltantes
+# 8. Patrones de faltantes
 # =============================================================================
 # Tres tipos de faltante en una serie de sensor:
 #   a) explícito: la fila existe, o3 es NaN
@@ -312,7 +314,7 @@ runpy.run_path(str(CLASE / "mapa.py"))
 #   c) implícito: la fila no existe (el minuto no está en el archivo)
 # Eliminar NaN sin mirar esto borra evidencia sobre el proceso de medición.
 
-## 10.1 Faltantes explícitos por estación
+## 8.1 Faltantes explícitos por estación
 resumen_na = (
     ozono_limpio.groupby("estacion")["o3"]
     .agg(n_filas="size",
@@ -322,7 +324,7 @@ resumen_na = (
 )
 print(resumen_na)
 
-## 10.2 ¿Cuándo faltan? Proporción de NaN por día
+## 8.2 ¿Cuándo faltan? Proporción de NaN por día
 na_dia = (
     ozono_limpio
     .assign(es_na=lambda d: d["o3"].isna())
@@ -345,7 +347,7 @@ plt.tight_layout()
 plt.show()
 
 
-## 10.3 Rachas de NaN consecutivos (equivalente de rle())
+## 8.3 Rachas de NaN consecutivos (equivalente de rle())
 def rachas_na(s: pd.Series) -> pd.DataFrame:
     es_na = s.isna().to_numpy()
     # cada cambio de valor abre una racha nueva
@@ -374,7 +376,7 @@ tabla_rachas = (
 )
 print(tabla_rachas)
 
-## 10.4 Faltantes implícitos: minutos que no están en el archivo
+## 8.4 Faltantes implícitos: minutos que no están en el archivo
 implicitos = (
     ozono_limpio.groupby("estacion")["fecha"]
     .agg(primero="min", ultimo="max", presentes="nunique")
