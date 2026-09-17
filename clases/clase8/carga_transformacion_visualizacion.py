@@ -8,6 +8,7 @@
 # =============================================================================
 #%%
 from pathlib import Path
+
 import os
 import numpy as np
 import pandas as pd
@@ -408,3 +409,24 @@ cobertura = (
     .reset_index()
 )
 print(cobertura)
+
+#######
+#6 Guardar dataset limpio
+#####
+ozono_limpio.to_csv(SUBCARPETA / "ozono_2024_limpio.csv", index=False, encoding="latin1")
+
+#######
+#7 UNIR datasets: ozono + pm + autoscope
+#####
+# El archivo de PM2.5 puede nombrar la medición de otra forma: mirar antes de usar.
+print(pm.tolist())
+print(pm.info())
+print("\nPrimeras 5 filas:")
+print(pm.head())
+
+pm_limpio = pm.copy()
+for buscar, reemplazar in pauta_limpieza.items():
+    pm_limpio["estacion"] = pm_limpio["estacion"].str.replace(
+        buscar, reemplazar, regex=False)
+
+print(pm_limpio.head())
