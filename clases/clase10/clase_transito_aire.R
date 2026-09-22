@@ -487,7 +487,7 @@ print(g9)
 #     error     lo que el modelo no sabe (viento, lluvia, otras fuentes)
 #
 # El rezago k sale del paso 9: el NO2 responde en ~1 hora, el PM2.5 en ~13.
-REZAGO <- c(no2 = 1, pm25 = 13)
+REZAGO <- c(no2 = 1, pm25 = 13)#se puede modificar
 
 ajustar_modelo <- function(col) {
   d <- tibble(hora            = df$hora,
