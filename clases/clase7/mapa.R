@@ -11,7 +11,7 @@
 # que se abre en cualquier navegador y se puede incrustar en Quarto (html).
 # =============================================================================
 suppressPackageStartupMessages({
-  library(leaflet)
+  library(leaflet) #
   library(leaflet.minicharts)
   library(htmlwidgets)
   library(dplyr)
@@ -44,10 +44,10 @@ estaciones <- ozono %>%
 
 # Coordenadas en UTM 21S -> lat/lon (solo si hace falta)
 if (max(abs(estaciones$lon)) > 1000) {
-  library(sf)
+  library(sf)#manejo datos espaciales
   estaciones <- estaciones %>%
-    st_as_sf(coords = c("lon", "lat"), crs = 32721) %>%
-    st_transform(4326) %>%
+    st_as_sf(coords = c("lon", "lat"), crs = 32721) %>%#
+    st_transform(4326) %>%#
     mutate(lon = st_coordinates(.)[, 1], lat = st_coordinates(.)[, 2]) %>%
     st_drop_geometry()
 }

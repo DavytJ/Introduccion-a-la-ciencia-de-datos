@@ -304,6 +304,12 @@ Joselina Davyt-Colo
 <section id="punto-3.-tipos-elementales" class="slide level2">
 <h2>Punto 3. Tipos elementales</h2>
 <table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Concepto</th>
@@ -338,6 +344,18 @@ Joselina Davyt-Colo
 <td><code>True</code> / <code>TRUE</code></td>
 </tr>
 <tr class="odd">
+<td>Fecha</td>
+<td><code>datetime.date</code></td>
+<td><code>Date</code></td>
+<td><code>2025-03-12</code></td>
+</tr>
+<tr class="even">
+<td>Categórica</td>
+<td><code>category</code> (pandas)</td>
+<td><code>factor</code></td>
+<td><code>"blando"</code> de tres valores posibles</td>
+</tr>
+<tr class="odd">
 <td>Ausente</td>
 <td><code>None</code> / <code>NaN</code></td>
 <td><code>NA</code></td>
@@ -345,6 +363,11 @@ Joselina Davyt-Colo
 </tr>
 </tbody>
 </table>
+</section>
+<section class="slide level2">
+
+<h3 id="los-dos-últimos-no-son-simétricos">Los dos últimos no son simétricos</h3>
+<p><code>factor</code> es un tipo de R base: el lenguaje fue diseñado para datos y ya sabe qué es una variable categórica. En Python no hay equivalente en el lenguaje: la categórica la aporta pandas. Lo mismo con <code>NA</code>, que en R es un valor del lenguaje y en Python son dos cosas distintas según el contexto.</p>
 </section>
 <section class="slide level2">
 

@@ -1,0 +1,27 @@
+1. Comprobar
+quarto --versión
+
+2. Buscar el ejecutable en el disco
+Get-ChildItem "C:\Program Files","$env:LOCALAPPDATA\Programs" -Filter quarto.exe -Recurse -ErrorAction SilentlyContinue | Select-Object FullName
+
+Si no aparece ninguno, no está instalado: winget install --id Posit.Quarto y saltear al paso 6.
+
+3. Verificar que ese sirve, con la ruta completa
+
+& "C:\Users\jodavyt\AppData\Local\Programs\Quarto\bin\quarto.exe" --versión
+
+4. Agregarlo al PATH del usuario, una sola vez
+$ruta = "C:\Users\jodavyt\AppData\Local\Programs\Quarto\bin"
+$actual = [Environment]::GetEnvironmentVariable('Path','User')
+if ($actual -notlike "*$ruta*") {
+    [Environment]::SetEnvironmentVariable('Path', "$actual;$ruta", 'User')
+}
+
+5. Recargar el PATH en la ventana abierta
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' +
+            [Environment]::GetEnvironmentVariable('Path','User')
+
+6. Verificar y renderizar
+
+quarto --version
+quarto render clase3\clase03_fundamentos.qmd

@@ -25,13 +25,16 @@ print(df.info())
 print("\nPrimeras 5 filas:")
 print(df.head())
 
-## 51. Dimensiones y estructura de los datos (Equivalente a str(df))
+## 5.1. Dimensiones y estructura de los datos (Equivalente a str(df))
 df.info()
 # Nota: df.shape te da exactamente las dimensiones (filas, columnas) -> (1222, 41)
 df.shape
 
-# 2. Filas únicas: detectando la columna que contiene el ID (Equivalente a length(unique(...)))
+# 5.2. Filas únicas: detectando la columna que contiene el ID (Equivalente a length(unique(...)))
 df["matricula_letra"].nunique()
+# Si df["columna"].nunique() es igual a len(df), esa columna es un ID único
+print("\nValores únicos por columna (Buscar candidatos a ID):")
+print(df.nunique())
 
 # 5.3 Datos faltantes
 
@@ -40,3 +43,7 @@ df.isnull().sum()  # Conteo de NA por columna
 
 ## 5.4 Duplicados
 df.duplicated().sum() # Cantidad de filas exactamente iguales
+
+## 5.5. Primeras filas
+print("\nPrimeras 5 filas:")
+print(df.head())

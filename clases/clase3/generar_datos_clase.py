@@ -16,7 +16,8 @@ Requisitos: pandas y openpyxl vienen con Anaconda. El archivo de SPSS necesita
 pyreadstat, que no viene incluido; si no está, ese formato se saltea y el resto
 se genera igual.
 """
-
+# %%
+import os
 import json
 import sqlite3
 from pathlib import Path
@@ -25,7 +26,7 @@ import pandas as pd
 
 # La carpeta se construye desde la ubicación de este archivo, no desde el
 # directorio de trabajo: así el script funciona desde cualquier lado.
-BASE = Path(__file__).parent
+BASE = Path.cwd()
 CARPETA = BASE / "datos_clase"
 CARPETA.mkdir(exist_ok=True)
 

@@ -1,0 +1,114 @@
+---
+title: "Clase 4 - Carga de datos"
+author: "Joselina Davyt"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    incremental: false
+    transition: none
+    width: 1280
+    height: 720
+    fig-align: center
+    
+    # --- AJUSTES PARA EXPORTACIÓN A PDF ---
+    pdf-max-pages-per-slide: 1    # Fuerza a que cada diapositiva ocupe solo 1 página de PDF
+    pdf-separate-fragments: false # Evita que las animaciones creen páginas duplicadas
+---
+
+<!-- Estilo CSS global para evitar que las imágenes se salgan de las diapositivas -->
+<style>
+.reveal section img {
+  max-height: 500px !important; /* Limita la altura máxima de cualquier imagen */
+  object-fit: contain;          # Ajusta la imagen proporcionalmente sin recortarla
+}
+</style>
+
+## Espacio de trabajo y organización de proyectos de ciencia de datos
+
+- Una buena organización de archivos es la base de cualquier proyecto profesional
+- Estructura de directorios: mantener una estructura clara e independiente del sistema:
+
+data/raw/ (datos originales e inmutables)
+
+data/processed/ (limpios)
+
+notebooks/ o src/ o scripts (código)
+
+outputs/ o resultados (reportes y modelos)
+
+## Rutas
+
+- ¿qué son las rutas?: definen en qué carpeta y archivos estoy trabajando en el proyecto de ciencia de datos
+- Preferible usar rutas relativas y no absolutas, porque las rutas absolutas impiden la reproducibilidad de los proyectos.
+- Ruta relativa: "data/raw/"
+- Ruta absoluta:  "C:/Users/..."
+- Las rutas son texto (=string/=character) para los lenguajes de programación
+- Existen paquetes y funciones que interpretan la ruta como tal
+
+## Trabajar con rutas 
+
+::: {.panel-tabset}
+
+## R {.scrollable}
+
+```{r}
+#| echo: true
+getwd() # al ejecutarlo me dice en dónde está parado el entorno ahora
+# sirve para fijar la ruta del entorno o espacio de trabajo, genera rutas absolutas no relativas
+setwd("C:/Users/jodavyt/Documents/GitHub/Introduccion-a-la-ciencia-de-datos") 
+```
+
+
+## Python {.scrollable}
+
+Antes, si estas trabajando dentro de RStudio ejecuta (dentro de VS no es necesario)
+
+```{r}
+#| echo: true
+reticulate::py_require(c("pandas", "numpy", "matplotlib"))
+```
+
+En python permite trabajar con rutas absolutas y relativas:
+
+```{python}
+#| echo: true
+#| eval: false
+import os
+
+# es el equivalente a getwd() de R
+os.getcwd()
+# Subir un nivel en el árbol de carpetas (equivalente a 'cd ..')
+os.chdir("..")
+os.getcwd()
+```
+
+```{python}
+#| echo: true
+#| eval: false
+# Entrar a una subcarpeta desde el directorio actual
+os.chdir("clases/clase4")
+# ruta absoluta:
+#os.chdir("C:/Users/jodavyt/Documents/GitHub/Introduccion-a-la-ciencia-de-datos/clases/clase3")
+```
+
+:::
+## Trabajar con rutas: el enfoque moderno
+
+::: {.panel-tabset}
+
+El enfoque moderno implica trabajar con paquetes que utilicen la raíz del proyecto.
+
+## R
+
+```{r}
+#| echo: true
+install.pa
+library(here)
+```
+
+## Python
+
+:::
+

@@ -1,0 +1,136 @@
+/*-- scss:defaults --*/
+
+// Paleta: verde oscuro, verde agua de acento, grises fríos
+$verde:       #0f4c3a;
+$verde-claro: #ecf5f1;
+$agua:        #1fa59a;
+$agua-claro:  #e3f7f2;
+$gris-texto:  #2b2b2b;
+$gris-suave:  #6b6b6b;
+$gris-linea:  #d9d9d9;
+
+$font-family-sans-serif: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+$font-family-monospace:  "JetBrains Mono", "Fira Mono", Consolas, monospace;
+
+$body-bg:     #ffffff;
+$body-color:  $gris-texto;
+$link-color:  $agua;
+$presentation-heading-color: $verde;
+$presentation-heading-font-weight: 700;
+$presentation-font-size-root: 30px;
+$presentation-h1-font-size: 2.1em;
+$presentation-h2-font-size: 1.35em;
+$code-block-bg: #f6f7f9;
+$code-color:  $verde;
+
+/*-- scss:rules --*/
+
+// ---------- Títulos ----------
+.reveal h2 {
+  display: block;
+  margin-bottom: 0.6em;
+  border-bottom: none;
+}
+.reveal h2::after {
+  content: "";
+  display: block;
+  width: 3em;          // largo del subrayado; 100% si lo quieren de lado a lado
+  height: 4px;
+  background: $agua;
+  margin-top: 0.2em;
+  border-radius: 2px;
+}
+
+// ---------- Diapositivas de sección (# ) ----------
+.reveal .slides section.level1 > h1 {
+  color: #fff;
+  border: none;
+}
+.reveal .slides section.level1 {
+  background: $verde;
+  color: #fff;
+}
+.reveal .slides section.level1 p { color: rgba(255,255,255,0.85); }
+
+// ---------- Portada ----------
+.reveal .title-slide {
+  background: $verde;
+  color: #fff;
+}
+.reveal .title-slide h1 { color: #fff; }
+.reveal .title-slide .subtitle { color: #5fd6c4; font-size: 1.2em; }
+.reveal .title-slide .institute { color: rgba(255,255,255,0.8); font-size: 0.75em; }
+
+// ---------- Citas: se usan para las preguntas del cuestionario ----------
+.reveal blockquote {
+  background: $verde-claro;
+  border-left: 6px solid $agua;
+  border-radius: 4px;
+  padding: 0.5em 0.9em;
+  font-style: normal;
+  box-shadow: none;
+  width: 100%;
+  margin: 0.6em 0 0.9em 0;
+}
+.reveal blockquote p { margin: 0.15em 0; }
+
+// ---------- Tablas ----------
+.reveal table {
+  font-size: 0.72em;
+  border-collapse: collapse;
+  margin: 0.5em auto;
+}
+.reveal table th {
+  background: $verde;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.35em 0.7em;
+  border: none;
+}
+.reveal table td {
+  padding: 0.3em 0.7em;
+  border-bottom: 1px solid $gris-linea;
+}
+.reveal table tbody tr:nth-child(even) td { background: #f7f8fa; }
+
+// ---------- Código ----------
+.reveal pre { font-size: 0.6em; line-height: 1.35; }
+.reveal pre code { border-radius: 6px; padding: 0.7em; }
+.reveal code { color: $verde; }
+.reveal p code, .reveal li code, .reveal td code {
+  background: $verde-claro;
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+// ---------- Énfasis ----------
+.reveal strong { color: $verde; }
+.reveal .clave { color: $agua; font-weight: 700; }
+
+// ---------- Caja destacada: usar con ::: {.destacado} ----------
+.reveal .destacado {
+  background: $agua-claro;
+  border-left: 6px solid $agua;
+  padding: 0.5em 0.9em;
+  border-radius: 4px;
+  margin: 0.8em 0;
+}
+
+// ---------- Imágenes ----------
+.reveal img { max-height: 520px; object-fit: contain; }
+.reveal figure { margin: 0; }
+
+// ---------- Listas ----------
+.reveal ul li::marker { color: $agua; }
+.reveal ol li::marker { color: $agua; font-weight: 700; }
+
+// ---------- Pestañas R / Python ----------
+.reveal .panel-tabset .nav-tabs .nav-link.active {
+  color: $verde;
+  border-bottom: 3px solid $agua;
+  font-weight: 600;
+}
+
+// ---------- Número de diapositiva y pie ----------
+.reveal .slide-number { color: $gris-suave; font-size: 0.5em; }
