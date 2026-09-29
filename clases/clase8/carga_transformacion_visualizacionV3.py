@@ -1,4 +1,5 @@
 # =============================================================================
+
 # Carga y transformación
 # Ejemplo: medioambiente y aire (ozono, PM2.5, conteo vehicular) — Montevideo
 # Versión Python (pandas + matplotlib) — equivalente de carga_y_transformacion.R
@@ -13,6 +14,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 archivo = "o3_01_2024_04_2024.csv"
 BASE_DIR = Path.cwd()
@@ -44,7 +46,8 @@ pm = pd.read_csv(SUBCARPETA / "pm_2_5_01_2024_04_2024.csv",
 # discriminarse por carril dentro de cada sentido.
 auto = pd.read_csv(SUBCARPETA / "autoscope_04_2024_volumen.csv",
                    encoding="latin1", parse_dates=["fecha"])
-
+auto.info()
+print(auto.head())
 
 # =============================================================================
 # 2. Data profiling: id, nulos y duplicados
@@ -595,7 +598,7 @@ plt.show()
 # Lo nuevo: reindex a una grilla completa (como grilla_horaria en la sección 7),
 # shift (la serie corrida k pasos) y autocorrelación (la serie correlacionada
 # consigo misma a distintos rezagos).
-import matplotlib.dates as mdates
+
 
 ESTACION = "Curva de Maronias"
 o3_s = ozono_limpio[ozono_limpio["estacion"] == ESTACION].set_index("fecha")["o3"].sort_index()
