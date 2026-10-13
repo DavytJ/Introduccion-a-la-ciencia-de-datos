@@ -34,7 +34,7 @@ library(readr)      # read_csv
 library(lubridate)  # hour, wday, as_date
 library(ggplot2)    # gráficos
 
-RUTA <- "clases/clase10/transito_aire_junio2024.csv"
+RUTA <- "clases/clase10/transito_aire_junio2024.csv" #cambiar la ruta de donde guarden los datos
 
 COL_TRANSITO <- "#2E86AB"
 COL_NO2      <- "#7B4B2A"
@@ -414,7 +414,7 @@ print(correlaciones_pm25)
 
 # ---- 5.3 La dispersión con una tercera variable: el color --------------------
 g17 <- ggplot(filter(tres_cruces, !is.na(no2)), aes(transito, no2, color = franja)) +
-  geom_point(size = 1.5, alpha = 0.7) +
+  geom_point(size = 6, alpha = 0.7) +
   scale_color_manual(values = c("madrugada" = "grey60", "mañana" = COL_PM25,
                                 "tarde" = COL_TRANSITO, "noche" = COL_OSCURO)) +
   labs(title = "Tránsito y NO2 en Tres Cruces, por franja horaria",
@@ -440,6 +440,7 @@ print(g17)
 tc <- tres_cruces |> filter(!is.na(no2))       # las 291 horas con NO2
 
 modelo_tc <- lm(no2 ~ transito_miles, data = tc)
+summary(modelo_tc)
 coef(modelo_tc)                    # a y b
 summary(modelo_tc)$r.squared       # R²: parte de la variación que explica la recta
 # Qué vemos: a = 18,3 y b = 0,79. Una hora con 30 mil vehículos tiene, según
@@ -481,6 +482,15 @@ summary(modelo_tc3)$r.squared
 # Qué vemos: R² = 0,47. El PM2.5 no es una causa del NO2: las horas en que el
 #   aire no se renueva tienen los dos contaminantes altos. El PM2.5 funciona
 #   como indicador de esas condiciones, que no están en la tabla (viento, lluvia).
+
+gprueba <- ggplot(tc, aes(transito_miles, no2)) +
+  geom_point(alpha = 0.4, size = 1, color = COL_NO2) +
+  geom_abline(intercept = coef(modelo_tc3)[1]+coef(modelo_tc3)[3]*16.45, slope = coef(modelo_tc3)[2],
+              color = COL_OSCURO, linewidth = 1) +
+  labs(title = "Tres Cruces: NO2 = 18,3 + 0,79 · tránsito (en miles)",
+       x = "Miles de vehículos por hora", y = "NO2 (µg/m³)")
+print(gprueba)
+
 
 # ---- 6.5 Los errores del modelo (residuos) -----------------------------------
 # residuo = valor medido - valor que da la recta

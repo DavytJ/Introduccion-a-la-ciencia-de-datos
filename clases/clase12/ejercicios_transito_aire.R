@@ -34,9 +34,10 @@ library(readr)
 library(lubridate)
 library(ggplot2)
 
-RUTA <- "clases/clase10/transito_aire_junio2024.csv"
+RUTA <- "clases/clase12/"
 theme_set(theme_minimal(base_size = 12))
 
+source(here::here(paste0(RUTA, "analisis_transito_aire.R")))
 
 # =============================================================================
 # EJERCICIO 1. FALTANTES
@@ -60,7 +61,10 @@ theme_set(theme_minimal(base_size = 12))
 # =============================================================================
 # En la Parte 2 se creó hora_pico: las horas 7, 8, 9, 17, 18 y 19.
 # El gráfico muestra el tránsito promedio de cada hora del día en Tres Cruces,
-# de lunes a viernes, con las horas pico en color.
+# de lunes a viernes, con las horas pico en color.2 
+
+table(datos$hora_pico)
+unique(datos$hora_pico)
 
 por_hora <- datos |>
   filter(estacion == "Tres Cruces", tipo_dia == "lunes a viernes") |>
@@ -109,7 +113,8 @@ ggplot(por_hora, aes(h, transito, fill = hora_pico)) +
 # 3. ¿Mejoró el R²? ¿Mucho o poco?
 # -----------------------------------------------------------------------------
 
-
+modelo_tc4 <- lm(no2 ~ transito_miles + pm25 + franja, data = tc)
+summary(modelo_tc4)
 # =============================================================================
 # EJERCICIO 5. UNA VARIABLE BINARIA A PARTIR DEL RESULTADO
 # =============================================================================
@@ -121,6 +126,13 @@ ggplot(por_hora, aes(h, transito, fill = hora_pico)) +
 # 3. Mostrar los coeficientes y el R². ¿Cuánto suma la noche?
 # -----------------------------------------------------------------------------
 
+tc$noche = ifelse(tc$franja=="noche",1,0)
+
+# tc2 <- tc %>%
+#   mutate(noche = ifelse())
+
+modelo_tc5 <- lm(no2 ~ transito_miles + pm25 + noche, data = tc)#tc2
+summary(modelo_tc5)
 
 # =============================================================================
 # EJERCICIO 6. Interacciones
@@ -159,4 +171,6 @@ print(g17)
 # 2. Copiar el código de g17 y cambiarlo para usar la tabla tarde y
 #    colorear por tipo_dia en lugar de franja.
 # 3. ¿Qué son los dos grupos?
+# 4. Pensar teóricamente o hacerlo en código un nuevo modelo que tenga en cuenta
+# esta caracteristica
 # -----------------------------------------------------------------------------
