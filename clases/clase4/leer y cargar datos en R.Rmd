@@ -1,0 +1,67 @@
+---
+title: "Leer y cargar datos"
+author: "Joselina Davyt"
+date: "2026-08-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Manejo de rutas y directorio de trabajo
+
+```{r}
+library(readr)
+```
+
+
+## 1. Directorio de Trabajo (¿Dónde estoy?)
+
+```{r}
+# Ver la carpeta donde R está trabajando actualmente
+getwd()
+
+# Cambiar la carpeta de trabajo (usa siempre barras normales '/' o doble '\\')
+setwd("C:/Users/jodavyt/Documents/GitHub/Introduccion-a-la-ciencia-de-datos/clases/clase3")
+
+# Ver todos los archivos y carpetas que hay en el directorio actual
+list.files()
+```
+
+## 2. Manejo de rutas
+
+```{r}
+# La forma recomendada de construir rutas (funciona en Windows, Mac y Linux)
+CARPETA <- "C:/MisDocumentos/MiProyecto"
+ruta_completa <- file.path(CARPETA, "datos", "archivo.csv")#"archivo es el nombre"
+
+# Comprobar si existe un archivo o carpeta
+file.exists("comercio.db")
+dir.exists("datos")
+
+# Crear una carpeta nueva desde R
+dir.create("resultados")
+```
+
+## 3. Construcción de rutas relativas
+
+```{r}
+install.packages("here")
+library(here)
+```
+Al cargar el paquete, here muestra en la consola cuál es el "punto de partida" o la carpeta raíz de tu proyecto:
+
+
+```{r}
+# Te dice dónde empieza tu proyecto
+here() 
+# Salida esperada: "C:/Usuarios/TuNombre/MiProyecto"
+```
+
+
+# Cargar un archivo csv
+```{r}
+clase01_ventas <- read_csv("C:/Users/jodavyt/Documents/GitHub/Introduccion-a-la-ciencia-de-datos/salidas/clase01_ventas.csv")
+```
+

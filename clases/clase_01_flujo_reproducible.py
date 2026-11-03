@@ -1,13 +1,7 @@
 """
-CLASE 01 — Un análisis que otro pueda repetir
-Unidad 1: el dato todavía no existe (4 h)
 
-OBJETIVO
-  Que el resultado no dependa de quién lo corrió, ni de la carpeta, ni del día.
-
-IDEA CENTRAL
-  Un resultado que no se puede regenerar no es un resultado: es una anécdota.
 """
+
 import numpy as np
 import pandas as pd
 from _comun import RAIZ, SALIDAS, SEMILLA, guardar, titulo

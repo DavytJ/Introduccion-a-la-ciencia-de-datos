@@ -1,0 +1,818 @@
+# =============================================================================
+# Carga y transformación
+# Ejemplo: medioambiente y aire (ozono, PM2.5, conteo vehicular) — Montevideo
+# Versión Python (pandas + matplotlib) — equivalente de carga_y_transformacion.R
+# =============================================================================
+# Instalación (una sola vez):  pip install pandas numpy matplotlib
+# Para el mapa además:         pip install geopandas folium
+# =============================================================================
+#%%
+from pathlib import Path
+
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+archivo = "o3_01_2024_04_2024.csv"
+BASE_DIR = Path.cwd()
+SUBCARPETA = BASE_DIR / "clases/clase7"
+RUTA = BASE_DIR / SUBCARPETA / archivo
+
+# =============================================================================
+# 1. Carga de datos: ejemplo medioambiente y aire
+# =============================================================================
+# read_csv de R detecta fechas automáticamente; pandas necesita parse_dates.
+
+## Ozono — datos minutales de concentración de O3 en aire ambiente
+ozono = pd.read_csv(SUBCARPETA / "o3_01_2024_04_2024.csv",
+                    encoding="latin1", parse_dates=["fecha"])
+
+#Inspección inicial de los datos
+print(ozono.info())
+print("\nPrimeras 5 filas:")
+print(ozono.head())                   
+
+## Material particulado menor de 2,5 micras, estaciones automáticas
+pm = pd.read_csv(SUBCARPETA / "pm_2_5_01_2024_04_2024.csv",
+                 encoding="latin1", parse_dates=["fecha"])
+
+## Conteo vehicular en las principales avenidas de Montevideo
+# El sistema del Centro de Gestión de Movilidad (CGM) usa analíticas de video
+# para medir volúmenes vehiculares. Los detectores miden el total de vehículos
+# y su clasificación por largo, por sentido de circulación, y pueden
+# discriminarse por carril dentro de cada sentido.
+auto = pd.read_csv(SUBCARPETA / "autoscope_04_2024_volumen.csv",
+                   encoding="latin1", parse_dates=["fecha"])
+
+
+# =============================================================================
+# 2. Data profiling: id, nulos y duplicados
+# =============================================================================
+
+## 2.1 Información básica del dataset  (equivale a str())
+ozono.info()
+print(ozono.head())
+
+## 2.2 Identificador
+# Los datos se toman por estación (que tiene una ubicación geográfica, es decir,
+# es una característica de la estación) y por fecha.
+# El identificador podría ser la fecha: sirve para unir con otros datos.
+# También podría ser la combinación de fecha y estación.
+
+# 1- Tenemos problemas con los valores de las estaciones
+print(ozono.iloc[0:10, 2])          # filas 1-10, tercera columna (índice 2)
+
+print(ozono["estacion"].unique())
+
+# Creamos el diccionario de traducción (Busca -> Reemplaza)
+pauta_limpieza = {
+    "Ã³": "o",
+    "Ã±": "ni",
+    "Ã¡": "á",
+    "Ã©": "é",
+    "Ã­": "í",
+    "Ãº": "ú",
+    "Ã“": "Ó",
+    "Ã‘": "NI",
+    "Ã":  "í",   # a veces la 'í' sola se rompe así; dejarla al final del dict
+}
+
+# Aplicamos la limpieza a la columna. El dict conserva el orden de inserción,
+# así que las reglas se aplican en el mismo orden que el vector de R.
+ozono_limpio = ozono.copy()
+for buscar, reemplazar in pauta_limpieza.items():
+    ozono_limpio["estacion"] = ozono_limpio["estacion"].str.replace(
+        buscar, reemplazar, regex=False)
+
+## 2.3 Valores faltantes  (equivale a colSums(is.na()))
+print(ozono.isna().sum())
+
+# La única variable con valores faltantes es la medición, por lo tanto se pueden
+# eliminar, ya que no eliminamos identificador (podría discutirse si hay que
+# eliminar fechas sin registro).
+
+# Quito los NaN de todo el dataset:
+ozono_sinna = ozono_limpio.dropna()
+
+# Quito los NaN de columnas específicas:
+ozono_sinna = ozono_limpio.dropna(subset=["o3"]).copy()
+
+## 2.4 Duplicados
+# Número total de filas repetidas en todo el dataset
+print(ozono_sinna.duplicated().sum())
+
+# Mostrar TODAS las filas involucradas en un duplicado (la primera y sus copias)
+ozono_repetidas = ozono_sinna[ozono_sinna.duplicated(keep=False)]
+
+## 2.5 Eliminar duplicados
+# Conserva solo la primera aparición de cada fila única
+dataset_sindup = ozono_sinna.drop_duplicates()
+
+# Duplicados según una sola columna, conservando el resto del primer registro
+dataset_sindup_columna = ozono_sinna.drop_duplicates(subset=["estacion"])
+
+# otra manera de cargar los datos: etapa avanzada
+def cargar(archivo):
+    datos = pd.read_csv(SUBCARPETA / archivo, encoding="latin1", parse_dates=["fecha"])
+    for buscar, reemplazar in pauta_limpieza.items():
+        datos["estacion"] = datos["estacion"].str.replace(buscar, reemplazar, regex=False)
+    return datos.drop_duplicates()
+
+ozono_limpio = cargar("o3_01_2024_04_2024.csv")
+pm_limpio = cargar("pm_2_5_01_2024_04_2024.csv")
+
+# =============================================================================
+# 3. Tipos de datos y transformación de datos
+# =============================================================================
+
+## 3.1 Fechas
+# El equivalente de POSIXct en pandas es datetime64[ns]: internamente un entero
+# de 64 bits (nanosegundos desde el 1 de enero de 1970), lo que hace muy rápidas
+# las operaciones aritméticas entre fechas.
+print(ozono["fecha"].dtype)
+
+# Si la columna no se hubiera parseado al leer:
+# ozono["fecha"] = pd.to_datetime(ozono["fecha"])
+
+## 3.2 Crear variables  (el accesor .dt cumple el rol de lubridate)
+ozono_new = ozono_sinna.assign(
+    anio=lambda d: d["fecha"].dt.year,
+    mes=lambda d: d["fecha"].dt.month,
+    hora=lambda d: d["fecha"].dt.hour,
+)
+
+
+# =============================================================================
+# 4. Generación de información
+# =============================================================================
+
+## 4.1 Agregación mensual
+ozono_mes = (
+    ozono_new.groupby("mes")
+    .agg(o3_medio_mes=("o3", "mean"), n_registros_mes=("o3", "size"))
+    .reset_index()
+)
+print(ozono_mes)
+
+## 4.2 Visualización
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(ozono_mes["mes"], ozono_mes["o3_medio_mes"],
+        color="blue", linewidth=2)                        # línea
+ax.scatter(ozono_mes["mes"], ozono_mes["o3_medio_mes"],
+           color="red", s=60, zorder=3)                   # puntos
+ax.set(title="Concentración de Ozono en el ambiente, por mes, 2024",
+       xlabel="Fecha", ylabel="Valores")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+plt.tight_layout()
+fig.savefig("ozono_2024.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Partes básicas de un gráfico:
+#   - dataset
+#   - variable eje x
+#   - variable eje y
+#   - tipo de gráfico
+#   - títulos: del gráfico y nombres de los ejes
+
+def grafico_ozono(datos, color_puntos="red", color_linea="blue", ylim=(0, 40)):
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(datos["mes"], datos["o3_medio_mes"], color=color_linea, linewidth=2)
+    ax.scatter(datos["mes"], datos["o3_medio_mes"], color=color_puntos, s=60, zorder=3)
+    ax.set_xticks(datos["mes"])
+    ax.set_xticklabels(["Ene", "Feb", "Mar", "Abr"])
+    ax.set(title="Ozono troposférico: media mensual, enero a abril de 2024",
+           xlabel="Mes (2024)", ylabel="Ozono (µg/m³)")
+    ax.set_ylim(*ylim)
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+    fig.tight_layout()
+    return fig, ax
+
+plt.close("all")
+
+fig, ax = grafico_ozono(ozono_mes, color_puntos="green")
+fig.savefig("ozono_verde.png", dpi=300, bbox_inches="tight")
+plt.show()
+# =============================================================================
+# 5. Análisis profundo: agregación temporal minutal -> horario -> diario
+# =============================================================================
+# Pregunta central: al agregar, ¿qué estadístico representa el fenómeno?
+#   - media: nivel típico
+#   - máximo: episodios puntuales (sensible a errores del sensor)
+#   - percentil 95: episodios altos pero robusto a picos aislados
+#   - n: cuántos minutos respaldan el valor agregado (cobertura)
+
+
+def p95(x):
+    return x.quantile(0.95)
+
+
+## 5.1 Horario
+# pd.Grouper(freq=...) cumple el rol de floor_date() + group_by()
+ozono_hora = (
+    ozono_sinna
+    .groupby(["estacion", pd.Grouper(key="fecha", freq="h")])["o3"]
+    .agg(media="mean", maximo="max", p95=p95, n_min="size")   # n_min: máx 60
+    .reset_index()
+    .rename(columns={"fecha": "fecha_hora"})
+)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(ozono_hora["fecha_hora"], ozono_hora["media"], color="blue", linewidth=1)
+ax.scatter(ozono_hora["fecha_hora"], ozono_hora["media"], color="red", s=4, zorder=3)
+ax.set(title="Concentración de Ozono en el ambiente, por hora, 2024",
+       xlabel="Fecha", ylabel="Valores")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+plt.tight_layout()
+plt.show()
+
+# =============================================================================
+# 6. Diario
+# =============================================================================
+ozono_dia = (
+    ozono_sinna
+    .groupby(["estacion", pd.Grouper(key="fecha", freq="D")])["o3"]
+    .agg(media="mean", maximo="max", p95=p95, n_min="size")   # n_min: máx 1440
+    .reset_index()
+    .rename(columns={"fecha": "dia"})
+)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(ozono_dia["dia"], ozono_dia["media"], color="blue", linewidth=1)
+ax.scatter(ozono_dia["dia"], ozono_dia["media"], color="red", s=4, zorder=3)
+ax.set(title="Concentración de Ozono en el ambiente, por hora, 2024",
+       xlabel="Fecha", ylabel="Valores")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+plt.tight_layout()
+plt.show()
+
+# Las tres curvas cuentan historias distintas sobre el mismo día
+estaciones = ozono_dia["estacion"].unique()
+fig, axes = plt.subplots(len(estaciones), 1, figsize=(9, 3 * len(estaciones)),
+                         sharex=True, squeeze=False)
+for ax, est in zip(axes[:, 0], estaciones):
+    d = ozono_dia[ozono_dia["estacion"] == est]
+    for col in ("media", "p95", "maximo"):
+        ax.plot(d["dia"], d[col], label=col)
+    ax.set_title(est)
+    ax.set_ylabel("O3 (µg/m³)")
+    ax.grid(alpha=0.3)
+axes[0, 0].legend()
+fig.suptitle("Agregación diaria: media, p95 y máximo por estación")
+plt.tight_layout()
+plt.show()
+
+
+# =============================================================================
+# 7. Avanzado: máximo diario de la media móvil de 8 horas
+# =============================================================================
+# Las guías OMS (2021) para O3 usan el máximo diario de la media móvil de 8 h.
+# Una media móvil requiere una grilla horaria COMPLETA: si faltan horas, la
+# ventana de 8 posiciones deja de ser una ventana de 8 horas.
+
+grilla_horaria = pd.date_range(ozono_hora["fecha_hora"].min(),
+                               ozono_hora["fecha_hora"].max(), freq="h")
+
+# reindex sobre la grilla completa por estación = tidyr::complete()
+ozono_8h = (
+    ozono_hora
+    .set_index("fecha_hora")
+    .groupby("estacion")["media"]
+    .apply(lambda s: s.reindex(grilla_horaria))     # inserta NaN en horas ausentes
+    .rename_axis(["estacion", "fecha_hora"])
+    .reset_index()
+)
+# rolling(8, min_periods=8): si falta alguna de las 8 horas, el resultado es NaN,
+# igual que stats::filter con NA en la ventana.
+ozono_8h["media_8h"] = (
+    ozono_8h.groupby("estacion")["media"]
+    .transform(lambda s: s.rolling(8, min_periods=8).mean())
+)
+
+max_8h_dia = (
+    ozono_8h
+    .assign(dia=lambda d: d["fecha_hora"].dt.floor("D"))
+    .groupby(["estacion", "dia"])["media_8h"]
+    .agg(max_8h="max", horas_validas="count")   # max ignora NaN; count no los cuenta
+    .reset_index()
+)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for est, d in max_8h_dia.groupby("estacion"):
+    ax.plot(d["dia"], d["max_8h"], label=est)
+ax.axhline(100, linestyle="--", color="black")   # guía OMS 2021: 100 µg/m³
+ax.set(title="Máximo diario de la media móvil de 8 h", ylabel="O3 (µg/m³)")
+ax.legend()
+ax.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# =============================================================================
+# 8. Patrones de faltantes
+# =============================================================================
+# Tres tipos de faltante en una serie de sensor:
+#   a) explícito: la fila existe, o3 es NaN
+#   b) en rachas: muchos NaN consecutivos -> sensor caído o en mantenimiento
+#   c) implícito: la fila no existe (el minuto no está en el archivo)
+# Eliminar NaN sin mirar esto borra evidencia sobre el proceso de medición.
+
+## 8.1 Faltantes explícitos por estación
+resumen_na = (
+    ozono_limpio.groupby("estacion")["o3"]
+    .agg(n_filas="size",
+         n_na=lambda s: s.isna().sum(),
+         prop_na=lambda s: s.isna().mean())
+    .reset_index()
+)
+print(resumen_na)
+
+## 8.2 ¿Cuándo faltan? Proporción de NaN por día
+na_dia = (
+    ozono_limpio
+    .assign(es_na=lambda d: d["o3"].isna())
+    .groupby(["estacion", pd.Grouper(key="fecha", freq="D")])["es_na"]
+    .mean()
+    .rename("prop_na").reset_index()
+    .rename(columns={"fecha": "dia"})
+)
+
+estaciones = na_dia["estacion"].unique()
+fig, axes = plt.subplots(len(estaciones), 1, figsize=(9, 2.5 * len(estaciones)),
+                         sharex=True, squeeze=False)
+for ax, est in zip(axes[:, 0], estaciones):
+    d = na_dia[na_dia["estacion"] == est]
+    ax.bar(d["dia"], d["prop_na"], color="grey", width=1)
+    ax.set_title(est)
+    ax.set_ylabel("Proporción de NaN")
+fig.suptitle("Proporción de minutos sin dato, por día y estación")
+plt.tight_layout()
+plt.show()
+
+
+## 8.3 Rachas de NaN consecutivos (equivalente de rle())
+def rachas_na(s: pd.Series) -> pd.DataFrame:
+    es_na = s.isna().to_numpy()
+    # cada cambio de valor abre una racha nueva
+    id_racha = np.concatenate([[0], np.cumsum(es_na[1:] != es_na[:-1])])
+    return (pd.DataFrame({"faltante": es_na, "id_racha": id_racha})
+            .groupby("id_racha")
+            .agg(faltante=("faltante", "first"), largo=("faltante", "size"))
+            .reset_index(drop=True))
+
+
+rachas = (
+    ozono_limpio.sort_values(["estacion", "fecha"])
+    .groupby("estacion")["o3"]
+    .apply(rachas_na)
+    .reset_index(level=0)
+    .reset_index(drop=True)
+)
+
+tabla_rachas = (
+    rachas[rachas["faltante"]]
+    .assign(tipo=lambda d: pd.cut(
+        d["largo"], bins=[0, 1, 10, 60, 1440, np.inf],
+        labels=["1 min", "2-10 min", "11 min-1 h", "1 h-1 día", "> 1 día"]))
+    .groupby(["estacion", "tipo"], observed=True).size()
+    .rename("n_rachas").reset_index()
+)
+print(tabla_rachas)
+
+## 8.4 Faltantes implícitos: minutos que no están en el archivo
+implicitos = (
+    ozono_limpio.groupby("estacion")["fecha"]
+    .agg(primero="min", ultimo="max", presentes="nunique")
+    .assign(
+        esperados=lambda d: ((d["ultimo"] - d["primero"])
+                             / pd.Timedelta(minutes=1)).astype(int) + 1,
+        implicitos=lambda d: d["esperados"] - d["presentes"],
+        prop_implicitos=lambda d: d["implicitos"] / d["esperados"],
+    )
+    .reset_index()
+)
+print(implicitos)
+
+## 10.5 Cobertura contra la grilla del período pedido
+INICIO = pd.Timestamp("2024-01-01 00:00:00")
+FIN    = pd.Timestamp("2024-04-30 23:59:00")
+ESPERADOS = int((FIN - INICIO) / pd.Timedelta(minutes=1)) + 1
+
+cobertura = (
+    ozono_limpio.groupby("estacion")
+    .agg(presentes=("fecha", "nunique"),
+         validos=("o3", "count"))          # count no cuenta los NaN
+    .assign(
+        esperados=ESPERADOS,
+        sin_fila=lambda d: d["esperados"] - d["presentes"],
+        fila_sin_medicion=lambda d: d["presentes"] - d["validos"],
+        cobertura=lambda d: 100 * (d["validos"] / d["esperados"]).round(3),
+    )
+    .reset_index()
+)
+print(cobertura)
+
+#######
+#6 Guardar dataset limpio
+#####
+ozono_limpio.to_csv(SUBCARPETA / "ozono_2024_limpio.csv", index=False, encoding="latin1")
+
+########################################
+#7 UNIR datasets: ozono + pm + autoscope
+########################################
+
+# 7.1 El archivo de PM limpio
+print(pm.info())
+print("\nPrimeras 5 filas:")
+print(pm.head())
+
+pm_limpio = pm.copy()
+for buscar, reemplazar in pauta_limpieza.items():
+    pm_limpio["estacion"] = pm_limpio["estacion"].str.replace(
+        buscar, reemplazar, regex=False)
+
+print(pm_limpio.head())
+
+# 7.2 Unir datasets: ozono + pm
+aire = pd.merge(ozono_limpio, pm_limpio, on=["fecha", "estacion"], how="inner")
+
+print(aire.info())
+print("\nPrimeras 5 filas:")
+print(aire.head()) #¿son los datos que queremos?
+
+# 7.3 
+# Resumir cada tabla a una fila por hora y estación,
+#    después unir. La agregación no es un capricho, es lo que hace que la
+#    clave sea única de cada lado.
+o3_h = ozono_limpio.groupby(["estacion", ozono_limpio["fecha"].dt.floor("h")])["o3"].mean().reset_index()
+pm_h = pm_limpio.groupby(["estacion", pm_limpio["fecha"].dt.floor("h")])["pm2_5"].mean().reset_index()
+aire = pd.merge(o3_h, pm_h, on=["estacion", "fecha"], how="inner", validate="one_to_one")
+print(len(o3_h), len(pm_h), len(aire))
+
+print(aire.info())
+print("\nPrimeras 5 filas:")
+print(aire.head()) #¿son los datos que queremos?
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 7), sharex=True)
+
+for est, d in aire.groupby("estacion"):
+    ax1.plot(d["fecha"], d["o3"], label=est, linewidth=0.6)
+    ax2.plot(d["fecha"], d["pm2_5"], label=est, linewidth=0.6)
+
+ax1.set(title="Ozono y PM2.5 por hora, enero a abril de 2024", ylabel="O3 (µg/m³)")
+ax2.set(xlabel="Fecha", ylabel="PM2.5 (µg/m³)")
+ax1.legend(title="Estación")
+for ax in (ax1, ax2):
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(7, 6))
+for est, d in aire.groupby("estacion"):
+    r = d["o3"].corr(d["pm2_5"])
+    ax.scatter(d["pm2_5"], d["o3"], s=6, alpha=0.3, label=f"{est} (r = {r:.2f})")
+ax.set(title="Ozono vs PM2.5, medias horarias", xlabel="PM2.5 (µg/m³)", ylabel="O3 (µg/m³)")
+ax.legend(title="Estación")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(7, 6))
+r = aire["o3"].corr(aire["pm2_5"])
+ax.scatter(aire["pm2_5"], aire["o3"], s=6, alpha=0.3)
+ax.set(title=f"Ozono vs PM2.5, medias horarias, {aire['estacion'].iloc[0]} (r = {r:.2f})",
+       xlabel="PM2.5 (µg/m³)", ylabel="O3 (µg/m³)")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(8, 6))
+sc = ax.scatter(aire["pm2_5"], aire["o3"], c=aire["fecha"].dt.hour,
+                cmap="twilight", s=6, alpha=0.5)
+fig.colorbar(sc, ax=ax, label="Hora del día")
+ax.set(title="Ozono vs PM2.5, medias horarias, Curva de Maroñas",
+       xlabel="PM2.5 (µg/m³)", ylabel="O3 (µg/m³)")
+ax.set_xscale("log")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+
+franjas = pd.cut(aire["fecha"].dt.hour, bins=[-1, 5, 11, 17, 23],
+                 labels=["madrugada (0–5)", "mañana (6–11)", "tarde (12–17)", "noche (18–23)"])
+
+fig, ax = plt.subplots(figsize=(8, 6))
+for franja, d in aire.groupby(franjas, observed=True):
+    ax.scatter(d["pm2_5"], d["o3"], s=8, alpha=0.5, label=franja)
+ax.set(title="Ozono vs PM2.5, medias horarias, Curva de Maroñas",
+       xlabel="PM2.5 (µg/m³)", ylabel="O3 (µg/m³)")
+ax.set_xscale("log")
+ax.set_xticks([3, 5, 10, 20, 30, 50])
+ax.set_xticklabels(["3", "5", "10", "20", "30", "50"])
+ax.minorticks_off()
+ax.legend(title="Franja horaria")
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8), sharex=True, sharey=True)
+
+for ax, (franja, d) in zip(axes.flat, aire.groupby(franjas, observed=True)):
+    r = d["o3"].corr(d["pm2_5"])
+    ax.scatter(d["pm2_5"], d["o3"], s=8, alpha=0.4)
+    ax.set_title(f"{franja}   r = {r:.2f}   n = {len(d)}")
+    ax.set_xscale("log")
+    ax.set_xticks([3, 5, 10, 20, 30, 50])
+    ax.set_xticklabels(["3", "5", "10", "20", "30", "50"])
+    ax.minorticks_off()
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+
+for ax in axes[1, :]:
+    ax.set_xlabel("PM2.5 (µg/m³)")
+for ax in axes[:, 0]:
+    ax.set_ylabel("O3 (µg/m³)")
+fig.suptitle("Ozono vs PM2.5 dentro de cada franja horaria, Curva de Maroñas")
+fig.tight_layout()
+plt.show()
+
+# Buscando correlaciones
+
+aire["hora"] = aire["fecha"].dt.hour
+aire["o3_res"]  = aire["o3"]    - aire.groupby("hora")["o3"].transform("mean")
+aire["pm_res"]  = aire["pm2_5"] - aire.groupby("hora")["pm2_5"].transform("mean")
+print(aire["o3_res"].corr(aire["pm_res"]))
+
+tabla = (aire.groupby(franjas, observed=True)
+             .apply(lambda d: pd.Series({
+                 "r_crudo":    d["o3"].corr(d["pm2_5"]),
+                 "r_residuos": d["o3_res"].corr(d["pm_res"]),
+                 "n": len(d)}), include_groups=False)
+             .round(2))
+print(tabla)
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8), sharex=True, sharey=True)
+
+for ax, (franja, d) in zip(axes.flat, aire.groupby(franjas, observed=True)):
+    r = d["o3_res"].corr(d["pm_res"])
+    ax.scatter(d["pm_res"], d["o3_res"], s=8, alpha=0.4)
+    ax.axhline(0, color="grey", linewidth=0.8)
+    ax.axvline(0, color="grey", linewidth=0.8)
+    ax.set_title(f"{franja}   r = {r:.2f}   n = {len(d)}")
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+
+for ax in axes[1, :]:
+    ax.set_xlabel("PM2.5, apartamiento de la media de su hora (µg/m³)")
+for ax in axes[:, 0]:
+    ax.set_ylabel("O3, apartamiento de la media de su hora (µg/m³)")
+fig.suptitle("Residuos por franja horaria, Curva de Maroñas")
+fig.tight_layout()
+plt.show()
+
+# serie temporal
+
+
+for nombre, s in [("o3", o3_s), ("pm25", pm_s)]:
+    dup = s.index.duplicated(keep=False)
+    print(nombre, "sellos repetidos:", dup.sum())
+    print(s[dup].head(6))
+
+est = "Curva de Maronias"
+o3_s = ozono_limpio[ozono_limpio["estacion"] == est].set_index("fecha")["o3"]
+pm_s = pm_limpio[pm_limpio["estacion"] == est].set_index("fecha")["pm2_5"]
+
+for nombre, s in [("o3", o3_s), ("pm25", pm_s)]:
+    dup = s.index.duplicated(keep=False)
+    print(nombre, "sellos repetidos:", dup.sum())
+    print(s[dup].head(6))
+
+grilla = pd.date_range("2024-01-01 00:00", "2024-04-30 23:59", freq="min")
+serie = pd.DataFrame({"o3": o3_s.reindex(grilla), "pm25": pm_s.reindex(grilla)})
+serie.index.name = "fecha"
+
+print("Filas:", len(serie))                      # 174240 = 121 días × 1440 min
+print(serie.isna().sum())                        # minutos sin dato por serie
+print(serie.describe())                          # rango de valores, negativos, ceros raros
+
+POR_HORA = 60
+
+# Gráfico de la serie: período completo y una semana
+semana = serie["2024-03-04":"2024-03-10"]
+
+fig, axes = plt.subplots(2, 2, figsize=(13, 7), sharey="row")
+for fila, (col, nombre) in enumerate([("o3", "O3"), ("pm25", "PM2.5")]):
+    axes[fila, 0].plot(serie.index, serie[col], linewidth=0.3)
+    axes[fila, 1].plot(semana.index, semana[col], linewidth=0.6)
+    axes[fila, 0].set_ylabel(f"{nombre} (µg/m³)")
+axes[0, 0].set_title("Enero a abril")
+axes[0, 1].set_title("Una semana (4 a 10 de marzo)")
+fig.suptitle(f"Ozono y PM2.5, {est}")
+fig.tight_layout()
+plt.show()
+
+# Autocorrelograma hasta 48 h, evaluado cada 10 minutos
+rezagos = range(0, 48 * POR_HORA + 1, 10)
+horas = [k / POR_HORA for k in rezagos]
+acf_o3 = [serie["o3"].corr(serie["o3"].shift(k)) for k in rezagos]
+acf_pm = [serie["pm25"].corr(serie["pm25"].shift(k)) for k in rezagos]
+
+fig, ax = plt.subplots(figsize=(10, 4.5))
+ax.plot(horas, acf_o3, label="O3")
+ax.plot(horas, acf_pm, label="PM2.5")
+ax.axhline(0, color="grey", linewidth=0.8)
+ax.set(title="Autocorrelación, enero a abril", xlabel="Rezago (horas)",
+       ylabel="Correlación con la serie rezagada", xticks=range(0, 49, 6))
+ax.legend()
+ax.grid(alpha=0.3)
+fig.tight_layout()
+plt.show()
+
+import matplotlib.dates as mdates
+
+for ax in axes[:, 0]:
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+for ax in axes[:, 1]:
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %d"))
+
+suave = serie.resample("10min").mean()
+
+# Autocorrelograma hasta 48 h, evaluado cada 10 minutos
+rezagos = range(0, 48 * POR_HORA + 1, 10)
+horas = [k / POR_HORA for k in rezagos]
+acf_o3 = [suave["o3"].corr(suave["o3"].shift(k)) for k in rezagos]
+acf_pm = [suave["pm25"].corr(suave["pm25"].shift(k)) for k in rezagos]
+
+fig, ax = plt.subplots(figsize=(10, 4.5))
+ax.plot(horas, acf_o3, label="O3")
+ax.plot(horas, acf_pm, label="PM2.5")
+ax.axhline(0, color="grey", linewidth=0.8)
+ax.set(title="Autocorrelación, enero a abril", xlabel="Rezago (horas)",
+       ylabel="Correlación con la serie rezagada", xticks=range(0, 49, 6))
+ax.legend()
+ax.grid(alpha=0.3)
+fig.tight_layout()
+plt.show()
+
+fino = pd.Series({k: suave["o3"].corr(suave["o3"].shift(k)) for k in range(120, 170)})
+print("Primer pico en", fino.idxmax(), "min")
+
+tramo = serie["2024-03-07 06:00":"2024-03-07 11:00"]
+tramo[["o3", "pm25"]].plot(subplots=True, figsize=(10, 5), marker=".", markersize=2, linewidth=0.5)
+plt.show()
+
+# =============================================================================
+# 9. Serie temporal: grilla al minuto, autocorrelación y correlación cruzada
+# =============================================================================
+# Una serie de tiempo es una columna cuyo índice es el tiempo, a paso fijo.
+# Lo nuevo: reindex a una grilla completa (como grilla_horaria en la sección 7),
+# shift (la serie corrida k pasos) y autocorrelación (la serie correlacionada
+# consigo misma a distintos rezagos).
+import matplotlib.dates as mdates
+
+ESTACION = "Curva de Maronias"
+o3_s = ozono_limpio[ozono_limpio["estacion"] == ESTACION].set_index("fecha")["o3"].sort_index()
+pm_s = pm_limpio[pm_limpio["estacion"] == ESTACION].set_index("fecha")["pm2_5"].sort_index()
+
+## 9.1 Sellos repetidos: reindex exige índice único (resample los promediaría)
+for nombre, s in [("O3", o3_s), ("PM2.5", pm_s)]:
+    dup = s.index.duplicated(keep=False)
+    print(nombre, "sellos repetidos:", dup.sum())
+# PM2.5 traía 3 pares de filas idénticas; drop_duplicates en la carga los saca.
+
+## 9.2 Grilla completa al minuto
+grilla = pd.date_range(INICIO, FIN, freq="min")
+serie = pd.DataFrame({"o3": o3_s.reindex(grilla), "pm25": pm_s.reindex(grilla)})
+serie.index.name = "fecha"
+print("Filas:", len(serie), "(121 días × 1440 min)")
+print(serie.isna().sum())
+print(serie.describe().round(1))
+
+## 9.3 Huecos: rachas de NaN con fecha de inicio y fin
+falta = serie["o3"].isna()
+bloque = (falta != falta.shift()).cumsum()
+huecos = (serie[falta].groupby(bloque[falta])
+          .apply(lambda g: pd.Series({"desde": g.index[0], "hasta": g.index[-1],
+                                      "horas": len(g) / 60}))
+          .reset_index(drop=True))
+print(huecos.sort_values("horas", ascending=False).head(10))
+# Un corte de 14 días (20/3 al 2/4) y cortes de horas en abril. corr() descarta
+# los pares con NaN, así que los huecos no rompen lo que sigue.
+
+## 9.4 Las dos series en el tiempo
+# Para graficar y correlacionar usamos promedios de 10 min: el dato al minuto es
+# entero y parpadea entre dos niveles vecinos (resolución del sensor, no aire).
+suave = serie.resample("10min").mean()
+POR_HORA = 6
+semana = suave["2024-03-04":"2024-03-10"]
+print("Cajas sin dato en la semana:")
+print(semana.isna().sum())            # hay un corte corto el 5–6 de marzo
+
+fig, axes = plt.subplots(2, 2, figsize=(13, 7))
+for fila, (col, nombre) in enumerate([("o3", "O3"), ("pm25", "PM2.5")]):
+    axes[fila, 0].plot(suave.index, suave[col], linewidth=0.4)
+    axes[fila, 1].plot(semana.index, semana[col], linewidth=0.8)
+    axes[fila, 0].set_ylabel(f"{nombre} (µg/m³)")
+axes[0, 0].set_title("Enero a abril, promedios de 10 min")
+axes[0, 1].set_title("Una semana (4 a 10 de marzo)")
+axes[1, 0].set_ylim(0, 250)           # queda fuera un valor de 600 a mediados de enero
+for ax in axes[:, 0]:
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+for ax in axes[:, 1]:
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %d"))
+for ax in axes.flat:
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+fig.suptitle(f"Ozono y PM2.5, {ESTACION}")
+fig.tight_layout()
+plt.show()
+# Se ve: el corte de marzo, el ciclo diario del O3 en la semana, y PM2.5 como
+# base plana con picos de minutos (fuente local intermitente, sin ciclo diario).
+
+## 9.5 Gráfico de rezago: shift(k) deja en cada fila el valor de hace k pasos
+rezagos_horas = [1/6, 1, 12, 24]      # 10 min, 1 h, 12 h, 24 h
+fig, axes = plt.subplots(1, 4, figsize=(14, 3.8), sharey=True)
+for ax, h in zip(axes, rezagos_horas):
+    k = int(h * POR_HORA)
+    r = semana["o3"].corr(semana["o3"].shift(k))
+    ax.scatter(semana["o3"].shift(k), semana["o3"], s=4, alpha=0.4)
+    ax.set_title(f"rezago {h:g} h   r = {r:.2f}")
+    ax.set_xlabel(f"O3 hace {h:g} h")
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+axes[0].set_ylabel("O3 ahora")
+fig.suptitle("Ozono contra sí mismo a distintos rezagos, una semana")
+fig.tight_layout()
+plt.show()
+
+## 9.6 Autocorrelograma: el r de arriba para cada rezago, hasta 48 h
+rezagos = range(0, 48 * POR_HORA + 1)
+horas = [k / POR_HORA for k in rezagos]
+acf_o3 = [suave["o3"].corr(suave["o3"].shift(k)) for k in rezagos]
+acf_pm = [suave["pm25"].corr(suave["pm25"].shift(k)) for k in rezagos]
+
+fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
+for ax, acf, nombre in [(axes[0], acf_o3, "O3"), (axes[1], acf_pm, "PM2.5")]:
+    ax.vlines(horas, 0, acf, linewidth=1.5)
+    ax.plot(horas, acf, "o", markersize=2.5)
+    ax.axhline(0, color="grey", linewidth=0.8)
+    ax.set_ylabel("Autocorrelación")
+    ax.set_title(nombre)
+    ax.grid(alpha=0.3)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+axes[1].set(xlabel="Rezago (horas)", xticks=range(0, 49, 6))
+fig.suptitle("Autocorrelograma, enero a abril")
+fig.tight_layout()
+plt.show()
+
+# Lectura: arranca en 1 (rezago 0). Lo esperable para ozono era un mínimo a
+# 12 h y un máximo a 24 h (ciclo diario). Aparece otra cosa: picos regulares
+# cada ~2.4 h, iguales en las dos series. Dos contaminantes con procesos
+# distintos no comparten un período así: es del instrumento, no de la
+# atmósfera. Afinamos el período sobre la serie al minuto:
+fino = pd.Series({k: serie["o3"].corr(serie["o3"].shift(k)) for k in range(120, 170)})
+print("Primer pico de autocorrelación en", fino.idxmax(), "min")
+# 143 min no divide a 1440: el ciclo no va con el reloj, cada día arranca en
+# otra fase. Queda como pregunta abierta: qué hace el equipo cada 143 minutos.
+
+## 9.7 Correlación cruzada: PM2.5 de hace k pasos contra O3 de ahora
+rezagos_c = range(-24 * POR_HORA, 24 * POR_HORA + 1)
+horas_c = [k / POR_HORA for k in rezagos_c]
+ccf = [suave["o3"].corr(suave["pm25"].shift(k)) for k in rezagos_c]
+
+fig, ax = plt.subplots(figsize=(10, 4.5))
+ax.plot(horas_c, ccf)
+ax.axhline(0, color="grey", linewidth=0.8)
+ax.axvline(0, color="grey", linewidth=0.8, linestyle="--")
+ax.set(title="Correlación entre O3 y PM2.5 según el rezago",
+       xlabel="Rezago de PM2.5 respecto de O3 (horas; > 0 es PM del pasado)",
+       ylabel="Correlación", xticks=range(-24, 25, 6))
+ax.grid(alpha=0.3)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+fig.tight_layout()
+plt.show()
+# En rezago 0 es el r de la sección anterior. La onda de ~2.4 h reaparece: es
+# el mismo ciclo del instrumento, y hay que descontarlo antes de leer cualquier
+# relación entre los dos contaminantes.

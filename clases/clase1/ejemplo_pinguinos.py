@@ -19,6 +19,7 @@ pinguinos = pd.DataFrame({
 
 print(pinguinos.to_string(index=False))
 
+
 # Ver las primeras filas
 print(pinguinos.head())
 
@@ -36,17 +37,17 @@ print(pinguinos.describe())
 print(pinguinos.columns)
 
 # Filtrar filas por condición
-filtro = pinguinos[pinguinos["edad"] > 30]
+filtro = df[pinguinos["edad"] > 30]
 print(filtro)
 
 # Seleccionar columnas específicas
-print(df[["nombre", "edad"]])
+print(pinguinos[["nombre", "edad"]])
 
 # Contar valores únicos
-print(df["ciudad"].value_counts())
+print(pinguinos["ciudad"].value_counts())
 
 # Eliminar valores nulos
-df = df.dropna()
+df = pinguinos.dropna()
 
 # Rellenar valores nulos
-df["edad"] = df["edad"].fillna(df["edad"].mean())
+pinguinos["edad"] = pinguinos["edad"].fillna(pinguinos["edad"].mean())

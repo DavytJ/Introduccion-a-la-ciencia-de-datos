@@ -28,6 +28,12 @@ invisible(lapply(paquetes, function(pkg) {
 Datos minutales de concentración de ozono (O3) en aire ambiente. 
 
 ```{r}
+getwd()
+setwd("ruta")
+```
+
+
+```{r}
 ozono <- read_csv(here::here("clases/clase7/o3_01_2024_04_2024.csv"),
                         locale = locale(encoding = "latin1"))
 ```
@@ -76,17 +82,11 @@ unique(ozono$estacion)
 ```
 ```{r}
 # 1. Creamos el diccionario de traducción (Busca = Reemplaza)
-pauta_limpieza <- c(
-  "Ã³" = "o",
-  "Ã±" = "ni",
-  "Ã¡" = "á",
-  "Ã©" = "é",
-  "Ã­" = "í",
-  "Ãº" = "ú",
-  "Ã“" = "Ó",
-  "Ã‘" = "NI",
-  "Ã"  = "í" # Nota: a veces la 'í' sola se rompe así, déjala al final de la lista
-)
+pauta_limpieza <- c("Ã³" = "o",
+                    "Ã±" = "ni")
+ozono$variableuno <- log(ozono$o3) # no usa paquetes
+ozono$variableuno <- log(ozono$o3) # no usa paquetes
+ozono$variableuno <- log(ozono$o3) # no usa paquetes
 
 # 2. Aplicamos la limpieza a tu columna
 ozono_limpio <- ozono %>%
@@ -107,6 +107,7 @@ La única variable que tiene valores faltantes es la medición, por lo tanto se 
 Quito los NA de todo el dataset (si hubieran más columnas con NA también quita esa fila):
 
 ```{r}
+# no sugerible
 ozono_sinna <- ozono_limpio %>%
   na.omit()
 ```
@@ -156,21 +157,23 @@ dataset_sindup_columna <- ozono_sinna %>%
 El formato "POSIXct" "POSIXt" representan el formato estándar para manejar fechas y horas exactas (lo que en programación se conoce como Timestamp o Datetime)
 
 ```{r}
-class(ozono$fecha)
+class(ozono$estacion)
 ```
 
 1. ¿Qué es POSIXct? (La clase real) La ct significa calendar time (tiempo de calendario).Internamente, R guarda esta variable como un número entero: la cantidad de segundos que han pasado desde el 1 de enero de 1970 hasta ese momento. Al ser un número por dentro, es un formato extremadamente rápido y eficiente para hacer cálculos (por ejemplo, restar dos fechas para saber cuántas horas o días pasaron).
 
 2. ¿Qué es "POSIXt"? (La clase heredada). Es una "superclase" virtual de R. Solo sirve para que R sepa que esa variable es un formato de tiempo y que puede usar con ella funciones de fechas (como sumarle días, extraer el mes, etc.)
 
-### Crear variables 
+### Crear variables / modificar variables
 
 ```{r}
 ozono_new <- ozono_sinna %>%
  mutate(
     anio = lubridate::year(fecha),
     mes  = lubridate::month(fecha),
-    hora = lubridate::hour(fecha)
+    hora = lubridate::hour(fecha),
+    estacion_categorica = as.factor(estacion),
+    dia = lubridate::day(fecha)
   )
 ```
 
@@ -189,9 +192,15 @@ ozono_mes <- ozono_new %>%
 *Visualización*
 
 ```{r}
+ozono_mes %>% #dato
+  ggplot(aes(x = mes, y = o3_medio_mes)) + #variables
+  geom_line(color = "blue", linewidth = 1) +  # tipo gráfico
+  geom_point(color = "red", size = 3) 
+  
+```
+```{r}
 ozono_mes %>%
 ggplot(aes(x = mes, y = o3_medio_mes)) +
-  geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
   geom_point(color = "red", size = 3) +       # Dibuja los puntos individuales
   theme_minimal() +                           # Aplica un diseño limpio
   labs(
@@ -201,7 +210,6 @@ ggplot(aes(x = mes, y = o3_medio_mes)) +
   )
   
 ```
-
 
 ### Partes básicas de un gráfico:
 
@@ -235,9 +243,19 @@ Pregunta central: al agregar, ¿qué estadístico representa el fenómeno?
 ### *Horario*
 
 ```{r}
-ozono_hora <- ozono_sinna %>%
-  mutate(fecha_hora = floor_date(fecha, unit = "hour")) %>%
-  group_by(estacion, fecha_hora) %>%
+ozono_hora <- ozono_new %>%
+  mutate(fecha_hora = floor_date(fecha, unit = "hour")) %>% #operacion 1: crea v
+  group_by(estacion, hora) %>% #genera valores agrupados
+  summarise(
+    media  = mean(o3),
+    maximo = max(o3),
+    p95    = quantile(o3, 0.95),
+    n_min  = n(),               # de un máximo de 60
+    .groups = "drop"
+  )
+ozono_fecha_hora <- ozono_new %>%
+  mutate(fecha_hora = floor_date(fecha, unit = "hour")) %>% #operacion 1: crea v
+  group_by(estacion, fecha_hora) %>% #genera valores agrupados
   summarise(
     media  = mean(o3),
     maximo = max(o3),
@@ -250,6 +268,17 @@ ozono_hora <- ozono_sinna %>%
 
 ```{r}
 ozono_hora %>%
+ggplot(aes(x = hora, y = media)) +
+  geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
+  geom_point(color = "red", size = 1) +       # Dibuja los puntos individuales
+  theme_minimal() +                           # Aplica un diseño limpio
+  labs(
+    title = "Concentración de Ozono en el ambiente, por hora, 2024",
+    x = "Fecha",
+    y = "Valores"
+  )
+
+ozono_fecha_hora %>%
 ggplot(aes(x = fecha_hora, y = media)) +
   geom_line(color = "blue", linewidth = 1) +  # Une los puntos con una línea
   geom_point(color = "red", size = 1) +       # Dibuja los puntos individuales
@@ -325,7 +354,10 @@ ggplot(aes(x = dia, y = media)) +
 Las tres curvas cuentan historias distintas sobre el mismo día
 
 ```{r}
-ozono_dia %>%
+datos_pivot <- ozono_dia %>%
+  pivot_longer(c(media, p95, maximo), names_to = "estadistico", values_to = "o3")
+
+figura1 <- ozono_dia %>%
   pivot_longer(c(media, p95, maximo), names_to = "estadistico", values_to = "o3") %>%
   ggplot(aes(x = dia, y = o3, color = estadistico)) +
   geom_line() +
@@ -333,6 +365,10 @@ ozono_dia %>%
   theme_minimal() +
   labs(title = "Agregación diaria: media, p95 y máximo por estación",
        x = NULL, y = "O3 (µg/m³)")
+
+ggsave("estadisticos_ozono.png", figura1, width = 14, height = 7, dpi = 200, bg = "white")
+
+
 ```
 
 

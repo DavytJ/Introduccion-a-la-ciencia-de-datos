@@ -1,0 +1,718 @@
+---
+title: "Cargar datos: de la fuente al data frame"
+subtitle: "Clase teórico-práctica — versión en R"
+author: "Joselina Davyt-Colo"
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    number-depth: 2
+    code-copy: true
+    code-overflow: wrap
+    embed-resources: true
+    theme: simple
+---
+
+## Qué cubre esta clase y qué no
+
+El anexo de errores clasifica los mensajes que produce una lectura fallida. El
+práctico B ejercita el caso del CSV mal formado. Esta clase cubre lo anterior a
+las dos cosas: **cuántas fuentes distintas existen, qué decide cada función de
+lectura y qué información sobre los datos sobrevive según de dónde vengan**.
+
+Ningún bloque de este documento se ejecuta al compilar: las salidas están
+escritas debajo de cada bloque, como en el material de fundamentos. Para
+reproducirlas hay que correr una vez `generar_datos_clase.R`, que crea la
+carpeta `datos_clase/` con los archivos de ejemplo en los seis formatos.
+
+::: {.callout-note}
+## Paquetes
+```r
+install.packages(c("readr", "readxl", "haven", "DBI", "RSQLite",
+                   "jsonlite", "openxlsx"))
+```
+`readr`, `readxl` y `haven` vienen con el tidyverse. Los otros tres se instalan
+por separado. `sqlite3` no hace falta: `RSQLite` trae el motor adentro.
+:::
+
+# Parte I. Teoría
+
+## Un archivo no es una tabla
+
+Un archivo es una secuencia de bytes. Una tabla es una estructura con filas,
+columnas y un tipo por columna. Entre una cosa y la otra hay una traducción, y
+esa traducción no es única: el mismo archivo admite varias lecturas, todas
+sintácticamente válidas y solo una correcta.
+
+Esto no es una limitación técnica que un software mejor podría resolver. Es una
+propiedad del problema. El archivo no contiene la instrucción de cómo leerse a
+sí mismo, así que la instrucción tiene que venir de otro lado: de quien lo
+escribió, de la documentación, o —lo más frecuente— de una hipótesis que uno
+formula y después verifica.
+
+## Las cinco decisiones de toda lectura
+
+Cada vez que se ejecuta `read_csv()` o su equivalente, la función toma cinco
+decisiones. Si no se declaran, las toma por defecto, en silencio y sin avisar.
+
+| # | Decisión | Si se equivoca |
+|---|---|---|
+| 1 | Dónde termina un campo y empieza el siguiente | Columnas de menos, o todo en una sola |
+| 2 | Qué secuencias de caracteres son números | Columnas numéricas que quedan como texto |
+| 3 | Qué representa un valor ausente | Faltantes que entran a los cálculos como dato |
+| 4 | Cuál fila es el encabezado | Nombres de columna absurdos y una fila perdida |
+| 5 | Cómo se traduce cada byte a un carácter | Eñes y tildes rotas, o un error de codificación |
+
+`readr` agrupa cuatro de las cinco en un solo objeto, `locale()`: la marca
+decimal, la de miles, la codificación y el formato de fecha. Esa decisión de
+diseño no es cosmética: dice que las convenciones de un archivo son una unidad
+y no cinco argumentos sueltos.
+
+## El ciclo: leer, inspeccionar, declarar, releer
+
+De ahí se sigue el método de trabajo de esta clase, que es el mismo para
+cualquier fuente:
+
+1. **Leer** con los argumentos por defecto. Esta primera lectura no sirve para
+   analizar: sirve para ver qué supuso el programa.
+2. **Inspeccionar** el resultado contra el archivo crudo: forma, tipos,
+   primeras filas, faltantes.
+3. **Declarar** explícitamente las decisiones que estaban mal.
+4. **Releer** con esas decisiones escritas en el código.
+
+La primera lectura es una hipótesis; la inspección la contrasta; la segunda
+lectura la corrige y la deja registrada. Lo que queda versionado en el
+repositorio no es el archivo: es la lectura declarada.
+
+::: {.callout-important}
+En R el paso 1 es visible. Cuando `readr` lee un archivo, imprime la
+especificación de columnas que adivinó. Ese mensaje no es ruido que haya que
+silenciar: **es la hipótesis, impresa**. Silenciarlo con `show_col_types = FALSE`
+antes de haberlo leído es saltearse el paso 2.
+:::
+
+## Qué puede cargar cada formato
+
+Los formatos se distinguen por cuánta información sobre los propios datos son
+capaces de transportar. Cuanto menos transporta el archivo, más hay que
+reconstruir a mano en la lectura.
+
+| Formato | Transporta | Hay que reconstruir |
+|---|---|---|
+| CSV | Texto y nada más | Tipos, faltantes, orden de los niveles, todo |
+| Excel | Texto, algo de formato, varias hojas | Tipos reales, dónde empieza la tabla |
+| Stata `.dta` | Tipos, etiquetas de variable y de valor | Poco |
+| SPSS `.sav` | Tipos, etiquetas, faltantes declarados | Poco |
+| `.rds` | El objeto de R exacto, factores incluidos | Nada |
+| Base de datos | Tipos, relaciones, restricciones | Nada, pero hay que escribir la consulta |
+| JSON de una API | Estructura anidada | El aplanado y todos los tipos |
+
+::: {.callout-important}
+Un `.csv` no es un formato peor que un `.dta`: es un formato que delega. Todo lo
+que el `.dta` guarda adentro, el `.csv` lo deja en manos del código que lo lee.
+Por eso un `.csv` sin su diccionario de variables es un dataset incompleto.
+:::
+
+## Procedencia: de dónde vino y si se puede volver a buscar
+
+Un dato tiene, además de contenido, un origen que hay que poder declarar. No es
+lo mismo un archivo que alguien bajó a mano hace seis meses que una URL escrita
+en el código.
+
+| Origen | Se puede reproducir | Riesgo |
+|---|---|---|
+| Archivo suelto en el escritorio | No | Nadie sabe de dónde salió ni de cuándo es |
+| Archivo en el repositorio | Sí | Se desactualiza en silencio |
+| URL en el código | Sí, mientras la URL viva | La fuente cambia el archivo sin avisar |
+| API con parámetros | Sí, y con la consulta explícita | Requiere credenciales y control de versión |
+
+La regla práctica que se sigue en el curso: **descargar una vez, guardar la copia
+con fecha, y trabajar sobre la copia**. La descarga queda en el código para que
+sea reproducible; el análisis no depende de que la conexión funcione hoy.
+
+# Parte II. Seis fuentes
+
+Los archivos de ejemplo representan una cadena de locales comerciales con ventas
+mensuales por sucursal. Los crea `generar_datos_clase.R`, que hay que correr una
+sola vez antes de seguir.
+
+## CSV: el caso base
+
+El CSV es el formato que más delega, y por eso el que más decisiones exige. Este
+archivo usa las tres convenciones habituales en datos uruguayos: punto y coma
+como separador, coma decimal y codificación `latin-1`.
+
+### Primera lectura: la hipótesis por defecto
+
+```r
+ingenua <- read.csv("datos_clase/ventas_local.csv")
+ingenua
+```
+
+```
+                             id_local.sucursal.mes.ventas_uyu.empleados
+101;Centro;2025-01;128500                                          5;12
+102;Centro;2025-02;143200;12                                           
+103;Pocitos;2025-01;98750                                          25;8
+104;Cord\xf3n;2025-02;110430                                       75;9
+105;Pocitos;2025-03;152980                                           8
+106;Cord\xf3n;2025-03;121045                                        4;9
+```
+
+```r
+dim(ingenua)
+# [1] 6 1
+```
+
+Seis líneas que muestran tres decisiones fallando a la vez:
+
+- **El separador.** `read.csv()` supone que las columnas se separan con coma.
+  Como el archivo usa `;`, las cinco columnas quedaron en una sola, cuyo nombre
+  es `id_local.sucursal.mes.ventas_uyu.empleados`.
+- **El decimal.** La coma de `128500,5` sí funcionó como separador, así que esa
+  fila se partió en dos pedazos y el primero terminó de nombre de fila. Miralo
+  bien: **la fila 2 no se partió**, porque `143200` no lleva coma. La corrupción
+  ni siquiera es uniforme.
+- **La codificación.** `Cord\xf3n` es el byte `f3` de `latin-1` mostrado en
+  crudo, porque R esperaba UTF-8.
+
+::: {.callout-warning}
+Ningún mensaje de error apareció. Una lectura con el separador equivocado es una
+falla silenciosa: devuelve un objeto que parece un data frame y se puede seguir
+trabajando con él.
+:::
+
+### Inspección
+
+Antes de arreglar nada, mirar el archivo crudo. Son tres líneas y evitan
+adivinar:
+
+```r
+writeLines(head(readLines("datos_clase/ventas_local.csv", encoding = "latin1"), 3))
+```
+
+```
+id_local;sucursal;mes;ventas_uyu;empleados
+101;Centro;2025-01;128500,5;12
+102;Centro;2025-02;143200;12
+```
+
+Ahí se leen las tres decisiones de una: el separador es `;`, el decimal es `,`,
+y el encabezado está en la primera fila.
+
+### Segunda lectura: la hipótesis declarada
+
+R base tiene una función específica para la convención europea, `read.csv2()`,
+que ya asume `;` y coma decimal:
+
+```r
+ventas <- read.csv2("datos_clase/ventas_local.csv", fileEncoding = "latin1")
+str(ventas)
+```
+
+```
+'data.frame':	6 obs. of  5 variables:
+ $ id_local  : int  101 102 103 104 105 106
+ $ sucursal  : chr  "Centro" "Centro" "Pocitos" "Cordón" ...
+ $ mes       : chr  "2025-01" "2025-02" "2025-01" "2025-02" ...
+ $ ventas_uyu: num  128500 143200 98750 110431 152980 ...
+ $ empleados : int  12 12 8 9 8 9
+```
+
+Con `readr` la misma lectura devuelve un **tibble**, que al imprimirse muestra el
+tipo de cada columna debajo del nombre. La inspección deja de ser un paso
+separado:
+
+```r
+library(readr)
+
+ventas <- read_csv2("datos_clase/ventas_local.csv",
+                    locale = locale(encoding = "latin1"))
+```
+
+```
+ℹ Using "','" as decimal and "'.'" as grouping mark.
+Rows: 6 Columns: 5
+── Column specification ────────────────────────────────────────
+Delimiter: ";"
+chr (2): sucursal, mes
+dbl (3): id_local, ventas_uyu, empleados
+```
+
+Ese mensaje es la hipótesis de `readr`, escrita. Dice que adivinó dos columnas
+de texto y tres numéricas. Y ahí se ve el problema que queda: `mes` quedó como
+texto y `id_local` como número decimal.
+
+### La lectura declarada
+
+En R la corrección no requiere un segundo paso: el tipo de cada columna se
+declara dentro de la misma llamada, con `col_types`.
+
+```r
+ventas <- read_delim(
+    "datos_clase/ventas_local.csv",
+    delim  = ";",
+    locale = locale(decimal_mark = ",", encoding = "latin1"),
+    col_types = cols(
+        id_local   = col_integer(),
+        sucursal   = col_factor(levels = c("Centro", "Cordón", "Pocitos")),
+        mes        = col_date(format = "%Y-%m"),
+        ventas_uyu = col_double(),
+        empleados  = col_integer()))
+ventas
+```
+
+```
+# A tibble: 6 × 5
+  id_local sucursal mes        ventas_uyu empleados
+     <int> <fct>    <date>          <dbl>     <int>
+1      101 Centro   2025-01-01    128500.        12
+2      102 Centro   2025-02-01    143200         12
+3      103 Pocitos  2025-01-01     98750.         8
+4      104 Cordón   2025-02-01    110431.         9
+5      105 Pocitos  2025-03-01    152980          8
+6      106 Cordón   2025-03-01    121045.         9
+```
+
+Una sola llamada y las cinco columnas quedaron con el tipo que corresponde:
+entero, factor con sus niveles en orden declarado, fecha, decimal, entero.
+
+::: {.callout-note}
+Comparado con Python, esta es una ventaja real de `readr`: `pandas` también
+acepta un argumento `dtype`, pero las categóricas ordenadas y las fechas se
+terminan de construir después de leer, en líneas aparte. Acá la lectura y la
+declaración de tipos son el mismo acto.
+:::
+
+En Python:
+
+```python
+import pandas as pd
+
+ventas = pd.read_csv("datos_clase/ventas_local.csv",
+                     sep=";", decimal=",", encoding="latin-1")
+
+# los tipos se terminan de declarar después de leer
+ventas["sucursal"] = pd.Categorical(ventas["sucursal"],
+                                    categories=["Centro", "Cordón", "Pocitos"])
+ventas["mes"] = pd.PeriodIndex(ventas["mes"], freq="M")
+```
+
+## Excel: dónde empieza la tabla
+
+Una planilla no es un archivo de datos: es un documento que puede contener
+datos. Tiene títulos, notas al pie, celdas combinadas, varias hojas y filas en
+blanco de adorno. La decisión número 4 —cuál fila es el encabezado— acá es la
+que manda.
+
+```r
+library(readxl)
+
+read_excel("datos_clase/ventas.xlsx")
+```
+
+```
+New names:
+• `` -> `...2`
+• `` -> `...3`
+# A tibble: 9 × 5
+  `Reporte de ventas — uso interno` ...2     ...3    ...4       ...5     
+  <chr>                             <chr>    <chr>   <chr>      <chr>    
+1 Generado el 12/03/2025            NA       NA      NA         NA       
+2 NA                                NA       NA      NA         NA       
+3 id_local                          sucursal mes     ventas_uyu empleados
+4 101                               Centro   2025-01 128500.5   12       
+5 102                               Centro   2025-02 143200     12       
+```
+
+Las tres filas de título se leyeron como si fueran datos: el nombre de la
+primera columna salió del texto del título y las otras cuatro quedaron
+`...2`, `...3`. Además **todas las columnas son texto**, incluidas las
+numéricas, porque la primera fila de datos que encontró era el encabezado real.
+
+Un archivo de Excel además contiene varias hojas, y por defecto se lee la
+primera:
+
+```r
+excel_sheets("datos_clase/ventas.xlsx")
+# [1] "ventas"  "locales"
+```
+
+Declarando la hoja y cuántas filas saltear:
+
+```r
+ventas_xl <- read_excel("datos_clase/ventas.xlsx", sheet = "ventas", skip = 3)
+ventas_xl
+```
+
+```
+# A tibble: 6 × 5
+  id_local sucursal mes     ventas_uyu empleados
+     <dbl> <chr>    <chr>        <dbl>     <dbl>
+1      101 Centro   2025-01    128500.        12
+2      102 Centro   2025-02    143200         12
+3      103 Pocitos  2025-01     98750.         8
+```
+
+::: {.callout-important}
+Abrir un CSV con Excel para "ver cómo es" no es inocuo: Excel interpreta al
+abrir, convierte códigos con ceros a la izquierda en números, y fechas en otras
+fechas. Si después se guarda, esas conversiones quedan escritas en el archivo.
+Para inspeccionar un CSV se usa un editor de texto o el propio código.
+:::
+
+En Python:
+
+```python
+pd.ExcelFile("datos_clase/ventas.xlsx").sheet_names
+ventas_xl = pd.read_excel("datos_clase/ventas.xlsx", sheet_name="ventas", skiprows=3)
+```
+
+## Stata y SPSS: cuando el archivo trae sus etiquetas
+
+Son los formatos de los paquetes estadísticos, y los que va a encontrar quien
+trabaje con microdatos de encuesta: la Encuesta Continua de Hogares del INE y la
+mayoría de las encuestas de institutos de investigación se publican en `.dta` o
+`.sav`.
+
+La diferencia con un CSV es de fondo: estos archivos guardan los tipos y además
+guardan **etiquetas**, que son documentación adentro del propio archivo. En R
+los dos formatos se leen con el mismo paquete.
+
+```r
+library(haven)
+
+ventas_dta <- read_dta("datos_clase/ventas.dta")
+attr(ventas_dta$ventas_uyu, "label")
+# [1] "Ventas mensuales en pesos uruguayos"
+```
+
+Eso —"Ventas mensuales en pesos uruguayos"— es exactamente lo que en el práctico
+A había que escribir a mano en el diccionario de variables. En un `.dta` viaja
+con los datos, y `haven` lo deja pegado a la columna como un atributo.
+
+### SPSS y las etiquetas de valor
+
+SPSS agrega un nivel más: las **etiquetas de valor**, que traducen los códigos
+numéricos a texto. En una encuesta la variable llega como `1`, `2`, `3` y la
+etiqueta dice qué significa cada número.
+
+```r
+ventas_sav <- read_sav("datos_clase/ventas.sav")
+ventas_sav[, c("sucursal_cod", "ventas_uyu")]
+```
+
+```
+# A tibble: 6 × 2
+  sucursal_cod ventas_uyu
+  <dbl+lbl>         <dbl>
+1 1 [Centro]      128500.
+2 1 [Centro]      143200 
+3 2 [Pocitos]      98750.
+4 3 [Cordón]      110431.
+5 2 [Pocitos]     152980 
+6 3 [Cordón]      121045.
+```
+
+`<dbl+lbl>` es un tipo propio de `haven`: un número que arrastra su etiqueta.
+La celda muestra las dos cosas a la vez, el código y lo que significa.
+
+```r
+class(ventas_sav$sucursal_cod)
+# [1] "haven_labelled" "vctrs_vctr" "double"
+
+attr(ventas_sav$sucursal_cod, "labels")
+#  Centro Pocitos  Cordón 
+#       1       2       3 
+```
+
+Para trabajar, se elige uno de los dos: `as_factor()` se queda con las
+etiquetas, `zap_labels()` se queda con los códigos.
+
+```r
+as_factor(ventas_sav$sucursal_cod)[1:3]
+# [1] Centro  Centro  Pocitos
+# Levels: Centro Pocitos Cordón
+```
+
+::: {.callout-note}
+Acá hay una diferencia de diseño con Python que vale la pena señalar. `haven`
+pega los metadatos a la columna: el dato y su documentación viajan juntos y no
+se pueden separar por descuido. `pyreadstat`, en Python, devuelve dos objetos
+—los datos por un lado y los metadatos por otro—, y mantenerlos alineados queda
+por cuenta de quien programa.
+
+Lo que no cambia: aplicar o no las etiquetas es una decisión, no un detalle de
+presentación. Con los códigos se puede cruzar con otros archivos de la misma
+encuesta; con las etiquetas se puede leer una tabla. Lo que no conviene es
+cambiar de criterio a mitad del análisis.
+:::
+
+En Python:
+
+```python
+import pyreadstat
+
+crudo, meta = pyreadstat.read_sav("datos_clase/ventas.sav")
+meta.variable_value_labels
+# {'sucursal_cod': {1.0: 'Centro', 2.0: 'Pocitos', 3.0: 'Cordón'}}
+
+legible, _ = pyreadstat.read_sav("datos_clase/ventas.sav", apply_value_formats=True)
+```
+
+## Una URL es una ruta más
+
+Las funciones de lectura aceptan una dirección web donde aceptan una ruta. No
+hay nada especial que aprender:
+
+```r
+serie <- read_csv2("https://ejemplo.gub.uy/datos/serie.csv")
+```
+
+```python
+serie = pd.read_csv("https://ejemplo.gub.uy/datos/serie.csv",
+                    sep=";", decimal=",", encoding="latin-1")
+```
+
+Lo que sí hay que aprender es qué no hacer con eso. Leer directo de la URL cada
+vez que se corre el análisis tiene tres problemas: el análisis deja de funcionar
+sin conexión, la fuente puede cambiar el archivo sin avisar, y dos corridas del
+mismo código en fechas distintas pueden dar resultados distintos sin que quede
+registro.
+
+El patrón que resuelve las tres cosas es descargar una vez y fijar la copia:
+
+```r
+url     <- "https://ejemplo.gub.uy/datos/serie.csv"
+destino <- file.path("datos_clase", paste0("serie_", Sys.Date(), ".csv"))
+
+if (!file.exists(destino)) {              # solo la primera vez
+    download.file(url, destino, mode = "wb")
+}
+
+serie <- read_csv2(destino, locale = locale(encoding = "latin1"))
+```
+
+`mode = "wb"` no es opcional en Windows: sin eso, R abre la descarga en modo
+texto y puede alterar los saltos de línea de un archivo binario.
+
+El nombre del archivo lleva la fecha de descarga; el código de descarga queda
+versionado; el análisis corre sobre la copia. La procedencia queda declarada y
+el resultado es reproducible.
+
+## Base de datos: la consulta es parte de la lectura
+
+Con un archivo se lee todo y se filtra después. Con una base de datos se decide
+cuánto traer, y esa decisión se escribe en SQL. `RSQLite` trae el motor de la
+base adentro del paquete, así que no hay que instalar nada más.
+
+```r
+library(DBI)
+
+con <- dbConnect(RSQLite::SQLite(), "datos_clase/comercio.db")
+dbListTables(con)
+# [1] "locales" "ventas"
+```
+
+Traer una tabla entera es lo mismo que leer un archivo. Pero también se puede
+pedir que el trabajo lo haga la base y que llegue el resultado ya agregado,
+cruzando dos tablas:
+
+```r
+resumen <- dbGetQuery(con, "
+    SELECT v.sucursal,
+           l.region,
+           SUM(v.ventas_uyu) AS total_ventas,
+           COUNT(*)          AS meses
+    FROM ventas v
+    JOIN locales l ON v.sucursal = l.sucursal
+    GROUP BY v.sucursal, l.region
+    ORDER BY total_ventas DESC")
+
+dbDisconnect(con)
+resumen
+```
+
+```
+  sucursal region total_ventas meses
+1   Centro    Sur     271700.5     2
+2  Pocitos    Sur     251730.2     2
+3   Cordón Centro     231476.1     2
+```
+
+::: {.callout-note}
+Acá aparece una decisión que en un CSV no existe: **cuánto del análisis ocurre
+antes de que los datos lleguen**. Con tablas grandes la respuesta suele ser
+"bastante", porque traer diez millones de filas para después promediarlas es
+caro y lento. Pero cada agregación hecha en SQL es una decisión analítica que
+queda fuera del script de análisis, y hay que documentarla igual.
+
+`dbplyr` permite escribir esa consulta con verbos de `dplyr` y que se traduzca
+sola a SQL. Es cómodo, y tiene el mismo riesgo: la agregación sigue ocurriendo
+del lado de la base.
+:::
+
+En Python:
+
+```python
+import sqlite3
+
+con = sqlite3.connect("datos_clase/comercio.db")
+resumen = pd.read_sql(consulta, con)
+con.close()
+```
+
+## API: del JSON anidado a la tabla
+
+Una API devuelve JSON, que es una estructura de árbol y no una tabla. La
+dificultad no está en la conexión sino en el aplanado: hay que decidir qué nivel
+del árbol corresponde a una fila.
+
+Así se ve una respuesta típica:
+
+```json
+{
+  "meta": {
+    "fuente": "sistema interno",
+    "actualizado": "2025-03-31"
+  },
+  "resultados": [
+    {
+      "local": {"id": 101, "sucursal": "Centro"},
+      "periodo": "2025-01",
+      "ventas": 128500.5
+    },
+    {
+      "local": {"id": 103, "sucursal": "Pocitos"},
+      "periodo": "2025-01",
+      "ventas": 98750.25
+    }
+  ]
+}
+```
+
+Los datos no están en la raíz: están adentro de `resultados`, y cada resultado
+tiene a su vez un objeto `local` anidado. `jsonlite` convierte lo que puede a
+data frame, pero el nivel anidado queda como un data frame adentro de otro:
+
+```r
+library(jsonlite)
+
+crudo <- fromJSON("datos_clase/respuesta_api.json")
+str(crudo, max.level = 2)
+```
+
+```
+List of 2
+ $ meta      :List of 2
+  ..$ fuente     : chr "sistema interno"
+  ..$ actualizado: chr "2025-03-31"
+ $ resultados:'data.frame':	2 obs. of  3 variables:
+  ..$ local  :'data.frame':	2 obs. of  2 variables:
+  ..$ periodo: chr [1:2] "2025-01" "2025-01"
+  ..$ ventas : num [1:2] 128500 98750
+```
+
+La columna `local` **es un data frame**, no un vector. Se imprime como si fuera
+normal, pero no lo es: `ncol()` devuelve 3 y no 4. Con `flatten = TRUE` el árbol
+se aplana de verdad:
+
+```r
+datos <- fromJSON("datos_clase/respuesta_api.json", flatten = TRUE)$resultados
+datos
+```
+
+```
+  periodo    ventas local.id local.sucursal
+1 2025-01 128500.50      101         Centro
+2 2025-01  98750.25      103        Pocitos
+```
+
+La llamada real a la API:
+
+```r
+library(httr2)
+
+datos <- request("https://api.ejemplo.uy/ventas") |>
+    req_url_query(desde = "2025-01", hasta = "2025-03") |>
+    req_perform() |>
+    resp_body_string() |>
+    fromJSON(flatten = TRUE)
+```
+
+::: {.callout-warning}
+`req_perform()` corta con error si el servidor responde 4xx o 5xx, que es lo
+que uno quiere. Si en cambio se usa `fromJSON(url)` directamente, un error del
+servidor —que suele venir con su propio JSON de error— entra al análisis como si
+fuera un conjunto de datos distinto, sin producir ninguna excepción.
+:::
+
+En Python:
+
+```python
+import requests
+
+respuesta = requests.get("https://api.ejemplo.uy/ventas",
+                         params={"desde": "2025-01", "hasta": "2025-03"},
+                         timeout=30)
+respuesta.raise_for_status()          # esta línea no es opcional
+
+datos = pd.json_normalize(respuesta.json()["resultados"], sep="_")
+```
+
+# Parte III. La lectura declarada, encapsulada
+
+Las lecturas corregidas de esta clase tienen algo en común: son varias líneas
+con argumentos que hay que acertar, y se van a repetir en cada script del
+proyecto. Copiarlas es garantía de que en algún momento van a quedar
+desalineadas.
+
+La forma de que la lectura sea una sola decisión tomada una vez es encerrarla en
+una función que devuelva el dataset ya tipado:
+
+```r
+NIVELES_SUCURSAL <- c("Centro", "Cordón", "Pocitos")
+
+cargar_ventas <- function(ruta = "datos_clase/ventas_local.csv") {
+    read_delim(
+        ruta,
+        delim  = ";",
+        locale = locale(decimal_mark = ",", encoding = "latin1"),
+        col_types = cols(
+            id_local   = col_integer(),
+            sucursal   = col_factor(levels = NIVELES_SUCURSAL),
+            mes        = col_date(format = "%Y-%m"),
+            ventas_uyu = col_double(),
+            empleados  = col_integer()))
+}
+
+ventas <- cargar_ventas()
+```
+
+Cualquier script del proyecto hace `source("carga.R")` y obtiene el mismo
+dataset, con los mismos tipos, sin repetir un solo argumento. Si mañana la
+fuente cambia el separador, se corrige en un lugar.
+
+## Resumen
+
+| Fuente | R | Python | Lo que hay que declarar |
+|---|---|---|---|
+| CSV | `readr::read_delim` | `pd.read_csv` | Separador, decimal, codificación, faltantes |
+| Excel | `readxl::read_excel` | `pd.read_excel` | Hoja y dónde empieza la tabla |
+| Stata | `haven::read_dta` | `pd.read_stata` | Casi nada; la etiqueta viene como atributo |
+| SPSS | `haven::read_sav` | `pyreadstat.read_sav` | Si se aplican o no las etiquetas de valor |
+| URL | La misma función, con la dirección | Igual | Cuándo se descargó y dónde quedó la copia |
+| Base de datos | `DBI::dbGetQuery` | `pd.read_sql` | La consulta: qué traer y qué agregar antes |
+| API | `jsonlite::fromJSON` | `pd.json_normalize` | Qué nivel del árbol es una fila |
+
+Las tres cosas que hay que llevarse:
+
+1. La primera lectura es una hipótesis, no un resultado. En R esa hipótesis se
+   imprime sola: hay que leerla antes de silenciarla.
+2. El formato determina cuánto hay que reconstruir a mano. Un CSV no es peor que
+   un `.dta`: es un formato que delega, y hay que hacerse cargo de lo delegado.
+3. La lectura declarada se escribe una vez, con `col_types`, y se versiona. Es
+   parte del análisis, no un paso previo al análisis.

@@ -107,7 +107,19 @@ Una consecuencia práctica: si se ejecuta dos veces una celda que dice `df = df.
 | Decimal | `float` | `numeric`/`double` | `45.0` |
 | Texto | `str` | `character` | `"suave"` |
 | Lógico | `bool` | `logical` | `True` / `TRUE` |
+| Fecha | `datetime.date` | `Date` | `2025-03-12` |
+| Categórica | `category` (pandas) | `factor` | `"blando"` de tres valores posibles |
 | Ausente | `None` / `NaN` | `NA` | celda vacía |
+
+------------------------------------------------------------------------
+
+### Los dos últimos no son simétricos
+
+`factor` es un tipo de R base: el lenguaje fue diseñado para datos y ya sabe qué
+es una variable categórica. En Python no hay equivalente en el lenguaje: la
+categórica la aporta pandas. Lo mismo con `NA`, que en R es un valor del
+lenguaje y en Python son dos cosas distintas según el contexto.
+
 
 ------------------------------------------------------------------------
 
