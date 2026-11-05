@@ -1,0 +1,195 @@
+---
+title: "Analisis datos experimento"
+output: html_document
+date: "2026-11-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Paquetes
+
+```{r}
+# Paquetes
+
+install.packages(c("gtsummary", "effectsize"))
+
+
+library(effectsize)
+library(gtsummary)
+library(dplyr)
+```
+
+
+## Dato ejemplo (aqui levantar sus datos)
+
+```{r}
+# Ejemplo dataframe
+
+set.seed(123)
+n <- 20
+
+df <- tibble(
+  # binarias
+  sexo     = factor(sample(c("Femenino", "Masculino"), n, replace = TRUE)),
+  fumador  = factor(sample(c("No", "Sí"), n, replace = TRUE, prob = c(0.6, 0.4)),
+                    levels = c("No", "Sí")),
+  # categóricas
+  nivel_educ = factor(sample(c("Primaria", "Secundaria", "Terciaria"), n, replace = TRUE),
+                      levels = c("Primaria", "Secundaria", "Terciaria")),
+  region     = factor(sample(c("Norte", "Centro", "Sur"), n, replace = TRUE),
+                      levels = c("Norte", "Centro", "Sur")),
+  # numéricas (con algo de asociación inducida para que los tests "muestren" algo)
+  edad   = round(rnorm(n, mean = 40, sd = 10) + ifelse(fumador == "Sí", 8, 0)),
+  ingreso = round(rlnorm(n, meanlog = log(30000), sdlog = 0.4) *
+                    as.numeric(nivel_educ))          # asimétrica, crece con educación
+)
+
+df
+```
+
+# Tabla descriptiva
+
+```{r}
+# --- Tabla descriptiva con tests, comparando por sexo ---
+tabla <- df |>
+  tbl_summary(
+    by = sexo,
+    type = list(fumador ~ "dichotomous"),
+    value = list(fumador ~ "Sí"),
+    statistic = list(
+      edad    ~ "{mean} ({sd})",          # aprox. normal -> media (DE)
+      ingreso ~ "{median} ({p25}, {p75})" # asimétrica -> mediana (RIC)
+    ),
+    label = list(
+      edad ~ "Edad (años)",
+      ingreso ~ "Ingreso mensual",
+      fumador ~ "Fumador",
+      nivel_educ ~ "Nivel educativo",
+      region ~ "Región"
+    ),
+    digits = list(ingreso ~ 0)
+  ) |>
+  add_overall() |>
+  add_n() |>
+  add_p(
+    test = list(
+      edad    ~ "t.test",        # Welch
+      ingreso ~ "wilcox.test"
+      # categóricas: gtsummary elige chi-cuadrado o Fisher según esperados
+    )
+  ) |>
+  bold_p(t = 0.05) |>
+  bold_labels()
+
+tabla
+
+```
+
+Cada fila es una variable y las columnas muestran su resumen en toda la muestra y por separado en cada grupo (acá, por sexo). La última columna dice si hay evidencia de que la variable difiere entre los grupos.
+
+Columnas
+
+- Characteristic: el nombre de la variable. Las categóricas tienen sus niveles indentados debajo.
+- N: cuántas observaciones no faltantes tiene esa variable (acá 20 en todas, o sea, sin datos faltantes).
+- Overall (N = 20): el resumen en la muestra completa.
+- Femenino (N = 11) / Masculino (N = 9): el mismo resumen dentro de cada grupo.
+- p-value: el resultado del test que compara Femenino con Masculino para esa variable.
+
+Cómo leer cada celda (nota al pie ¹)
+
+- Fumador: 11 (55%) significa 11 personas que fuman, el 55%. Al ser dicotómica, solo se muestra el nivel “Sí”.
+- Nivel educativo y Región: n (%) por nivel. Los porcentajes son dentro de la columna; por ejemplo, el 45% de las mujeres son del Norte.
+- Edad: media (DE). Las mujeres promedian 41 años con desvío 8 y los hombres 47 con
+desvío 10.
+- Ingreso mensual: mediana (Q1, Q3), porque es asimétrica. La mediana masculina es más baja (35.000 contra 64.500), pero su rango intercuartílico va de 26.770 a 130.154, así que la dispersión es enorme.
+
+Qué test se usó (nota al pie ², en el mismo orden de las filas)
+
+- Fisher exacto para las categóricas. Se usó en lugar de chi-cuadrado porque con n = 20 hay frecuencias esperadas menores que 5.
+- t de Welch para la edad: compara medias sin asumir varianzas iguales.
+- Wilcoxon exacto para el ingreso: compara distribuciones por rangos, sin asumir normalidad.
+
+Conclusión: ningún p-valor es menor que 0,05, así que no hay evidencia de diferencias entre sexos en ninguna variable. Es lo esperable, porque en el df de mentira el sexo se generó al azar. Las asociaciones que inducimos fueron fumador–edad y educación–ingreso, y esta tabla no las mira porque compara por sexo. Para verlas, cambiá by = sexo por by = fumador o by = nivel_educ.
+
+# Asociación
+
+```{r}
+# ============================================================
+# TESTS DE ASOCIACIÓN
+# ============================================================
+library(effectsize)
+
+# Elegí el conjunto de datos:
+datos <- df_boot   # aumentado (n = 200) -> p-valores inflados, solo para probar
+# datos <- df      # original  (n = 20)  -> el que vale para inferencia
+
+
+# ---------- Categórica × categórica (vale para binaria) ----------
+
+# 2x2: sexo × fumador
+tab <- table(datos$sexo, datos$fumador)
+tab
+
+chisq.test(tab)              # test chi-cuadrado
+chisq.test(tab)$expected     # chequear esperados >= 5
+fisher.test(tab)             # alternativa exacta; en 2x2 también da el OR con IC
+
+phi(tab)                     # 2x2
+oddsratio(tab)               # 2x2
+
+# r × c: nivel educativo × región
+tab2 <- table(datos$nivel_educ, datos$region)
+tab2
+
+chisq.test(tab2)
+fisher.test(tab2, simulate.p.value = TRUE, B = 1e4)  # Fisher r×c con Monte Carlo
+cramers_v(tab2)              # r x c (incluye IC)
+
+
+# ---------- Binaria × continua: edad según fumador ----------
+
+t.test(edad ~ fumador, data = datos)             # Welch
+cohens_d(edad ~ fumador, data = datos)           # o hedges_g()
+
+cor.test(datos$edad, as.numeric(datos$fumador == "Sí"))   # punto-biserial
+
+wilcox.test(edad ~ fumador, data = datos)
+rank_biserial(edad ~ fumador, data = datos)
+
+
+# ---------- Categórica × continua: ingreso según nivel educativo ----------
+
+oneway.test(ingreso ~ nivel_educ, data = datos)  # ANOVA de Welch
+m <- aov(ingreso ~ nivel_educ, data = datos)
+eta_squared(m); omega_squared(m)
+
+kruskal.test(ingreso ~ nivel_educ, data = datos)
+rank_epsilon_squared(ingreso ~ nivel_educ, data = datos)
+
+# post-hoc
+pairwise.t.test(datos$ingreso, datos$nivel_educ, p.adjust.method = "holm")
+pairwise.wilcox.test(datos$ingreso, datos$nivel_educ, p.adjust.method = "holm")
+```
+
+
+# Aumentación de datos
+
+```{r}
+augment_boot <- function(data, n_new, noise = 0.1) {
+  idx <- sample(nrow(data), n_new, replace = TRUE)
+  out <- data[idx, ]
+  num <- names(out)[sapply(out, is.numeric)]
+  for (v in num) {
+    out[[v]] <- out[[v]] + rnorm(n_new, 0, noise * sd(data[[v]]))
+  }
+  out
+}
+
+set.seed(123)
+df_boot <- augment_boot(df, n_new = 200, noise = 0.1) |>
+  mutate(edad = round(edad),
+         ingreso = pmax(round(ingreso), 0))
+```
+
